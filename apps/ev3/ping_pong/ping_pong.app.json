@@ -1,0 +1,55 @@
+{
+  "name": "ping_pong",
+  "modules": [
+    "//apps/ev3/ping_pong:ping_components"
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "name": "ping",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "ping",
+            "type": "isaac::Ping"
+          }
+        ]
+      },
+      {
+        "name": "pong",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "pong",
+            "type": "isaac::Pong"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "source": "ping/ping/ping",
+        "target": "pong/pong/trigger"
+      }
+    ]
+  },
+  "config": {
+    "ping" : {
+      "ping" : {
+        "tick_period" : "2Hz"
+      }
+    },
+    "pong" : {
+      "pong" : {
+        "address": "ev3dev.local",
+        "port": 9999
+      }
+    }
+  }
+}

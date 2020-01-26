@@ -1,0 +1,29 @@
+build --keep_going --color=yes -c opt --crosstool_top=@toolchain//crosstool:toolchain
+
+build --define=target_platform=x86_64 --strip=always
+build --action_env=target_platform="x86_64"
+build:x86_64 --define=target_platform=x86_64 --strip=always
+build:x86_64 --action_env=target_platform="x86_64"
+
+build:host --define=target_platform=x86_64 --strip=always
+build:host --action_env=target_platform="x86_64"
+
+build:jetpack43 --cpu=arm64-v8a --strip=always
+build:jetpack43 --define=target_platform=jetpack43
+build:jetpack43 --action_env=target_platform="jetpack43"
+
+build:ev3dev --cpu=armv5tejl
+build:ev3dev --define=target_platform=ev3dev
+build:ev3dev --action_env=target_platform="ev3dev"
+build:ev3dev --crosstool_top=//toolchain:armv5tejl_toolchain_suite
+
+test --test_output=errors --keep_going --color=yes -c opt
+test --test_tag_filters=-lint
+
+build --python_top=//engine/build:python3
+test --python_top=//engine/build:python3
+run --python_top=//engine/build:python3
+
+test:lint --build_tests_only
+test:lint --test_tag_filters=lint
+test:lint --python_top=//engine/build:python27
