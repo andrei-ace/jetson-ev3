@@ -1,5 +1,5 @@
 .vscode/
-bazel_bin
+bazel-bin
 bazel-genfiles
 bazel-jetson-ev3
 bazel-out

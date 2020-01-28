@@ -23,9 +23,8 @@ class Pong : public alice::Codelet {
   // An incoming message channel on which we receive pings.
   ISAAC_PROTO_RX(PingProto, trigger);
 
-  // Specifies how many times we print 'PONG' when we are triggered
-  ISAAC_PARAM(std::string, address);
-  ISAAC_PARAM(int, port);
+  ISAAC_PARAM(std::string, address, "localhost");
+  ISAAC_PARAM(int, port, 9000);
 };
 
 }  // namespace isaac

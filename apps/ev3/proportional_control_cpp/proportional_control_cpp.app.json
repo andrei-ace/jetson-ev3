@@ -1,0 +1,119 @@
+{
+  "name": "proportional_control_cpp",
+  "modules": [
+    "//apps/ev3/proportional_control_cpp:proportional_control_cpp_codelet",
+    "@com_nvidia_isaac//packages/navigation",
+    "ev3"
+  ],
+  "config": {
+    "cpp_controller": {
+      "isaac.ProportionalControlCpp": {
+        "tick_period": "10ms"
+      }
+    },
+    "ev3": {
+      "isaac.Ev3Driver": {
+        "ip": "192.168.0.40",
+        "tick_period": "20ms",
+        "speed_limit_angular": 1.0,
+        "speed_limit_linear": 1.0,
+        "flip_orientation": true
+      },
+      "isaac.alice.Failsafe": {
+        "name": "robot_failsafe"
+      }
+    },
+    "odometry": {
+      "isaac.navigation.DifferentialBaseOdometry": {
+        "tick_period": "100Hz"
+      }
+    },
+    "websight": {
+      "WebsightServer": {
+        "webroot": "/home/andrei/ml/isaac/packages/sight/webroot",
+        "assetroot": "external/isaac_assets",
+        "port": 3000,
+        "ui_config": {
+          "windows": {
+            "Proportional Control C++": {
+              "renderer": "plot",
+              "channels": [
+                { "name": "proportional_control_cpp/cpp_controller/isaac.ProportionalControlCpp/reference (m)" },
+                { "name": "proportional_control_cpp/cpp_controller/isaac.ProportionalControlCpp/position (m)" }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "name": "cpp_controller",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.ProportionalControlCpp",
+            "type": "isaac::ProportionalControlCpp"
+          }
+        ]
+      },
+      {
+        "name": "ev3",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.Ev3Driver",
+            "type": "isaac::Ev3Driver"
+          },
+          {
+            "name": "isaac.alice.Failsafe",
+            "type": "isaac::alice::Failsafe"
+          }
+        ]
+      },
+      {
+        "name": "odometry",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.navigation.DifferentialBaseOdometry",
+            "type": "isaac::navigation::DifferentialBaseOdometry"
+          }
+        ]
+      },
+      {
+        "name": "commander",
+        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_commander.subgraph.json"
+      }
+    ],
+    "edges": [
+      {
+        "source": "ev3/isaac.Ev3Driver/ev3_state",
+        "target": "odometry/isaac.navigation.DifferentialBaseOdometry/state"
+      },
+      {
+        "source": "odometry/isaac.navigation.DifferentialBaseOdometry/odometry",
+        "target": "cpp_controller/isaac.ProportionalControlCpp/odometry"
+      },
+      {
+        "source": "cpp_controller/isaac.ProportionalControlCpp/cmd",
+        "target": "commander.subgraph/interface/control"
+      },
+      {
+        "source": "commander.subgraph/interface/command",
+        "target": "ev3/isaac.Ev3Driver/ev3_cmd"
+      }
+    ]
+  }
+}
