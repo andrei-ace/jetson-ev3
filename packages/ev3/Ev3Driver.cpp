@@ -22,10 +22,10 @@ void Ev3Driver::tick()
         messages::DifferentialBaseControl command;
         ASSERT(FromProto(rx_ev3_cmd().getProto(), rx_ev3_cmd().buffers(), command),
                "Failed to parse rx_ev3_cmd");
-        if (command.linear_speed() || command.angular_speed())
-        {
-            LOG_INFO("CMD available ls=%F as=%F", command.linear_speed(), command.angular_speed());
-        }
+        // if (command.linear_speed() || command.angular_speed())
+        // {
+        //     LOG_INFO("CMD available ls=%F as=%F", command.linear_speed(), command.angular_speed());
+        // }
 
         auto safeCmdPromise = Ev3Driver::sendCommand(command.linear_speed(), command.angular_speed(), &ev3Control);
 

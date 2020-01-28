@@ -13,11 +13,8 @@
     },
     "ev3": {
       "isaac.Ev3Driver": {
-        "ip": "192.168.0.40",
-        "tick_period": "20ms",
-        "speed_limit_angular": 1.0,
-        "speed_limit_linear": 1.0,
-        "flip_orientation": true
+        "address": "ev3dev.local",
+        "port": 9000
       },
       "isaac.alice.Failsafe": {
         "name": "robot_failsafe"
@@ -30,8 +27,7 @@
     },
     "websight": {
       "WebsightServer": {
-        "webroot": "/home/andrei/ml/isaac/packages/sight/webroot",
-        "assetroot": "external/isaac_assets",
+        "webroot": "external/com_nvidia_isaac/packages/sight/webroot",
         "port": 3000,
         "ui_config": {
           "windows": {
