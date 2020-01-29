@@ -41,6 +41,7 @@ toolchain {
   cxx_builtin_include_directory: "/usr/arm-linux-gnueabi/include/c++/7/backward"
 
   cxx_flag: "-std=c++14"
+  cxx_flag: "-Wno-psabi"
 
   # edit with your path to the toolchain
   linker_flag: "-L/home/andrei/ml/jetson-ev3/toolchain"

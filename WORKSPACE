@@ -32,7 +32,7 @@ cc_library(
     hdrs = ["ev3dev.h"],
     visibility = ["//visibility:public"],
     copts = [
-        "-Wno-unused-result"
+        "-Wno-unused-result",
     ],
 )""",
 )

@@ -25,6 +25,13 @@
         "tick_period": "100Hz"
       }
     },
+    "shared_robot_model": {
+      "DifferentialBaseModel": {
+        "robot_radius": 0.4,
+        "base_length": 0.18,
+        "wheel_radius": 0.017
+      }
+    },
     "websight": {
       "WebsightServer": {
         "webroot": "external/com_nvidia_isaac/packages/sight/webroot",
