@@ -34,9 +34,9 @@
             "Mapper Ev3 - Odometry": {
               "renderer": "plot",
               "channels": [
-                { "name": "joystick/odometry.odometry/DiferentialBaseWheelImuOdometry/state.heading" },
-                { "name": "joystick/odometry.odometry/DiferentialBaseWheelImuOdometry/state.pos_x" },
-                { "name": "joystick/odometry.odometry/DiferentialBaseWheelImuOdometry/state.pos_y" }
+                { "name": "joystick/odometry.odometry/DifferentialBaseWheelImuOdometry/state.heading" },
+                { "name": "joystick/odometry.odometry/DifferentialBaseWheelImuOdometry/state.pos_x" },
+                { "name": "joystick/odometry.odometry/DifferentialBaseWheelImuOdometry/state.pos_y" }
               ]
             }
           }

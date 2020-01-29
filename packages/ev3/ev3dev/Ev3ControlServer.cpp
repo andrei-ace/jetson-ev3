@@ -9,7 +9,7 @@
 
 const int MAX_SPEED = 900;
 const float TACHO_TO_SPEED = 0.000255;
-const float BASE_LENGHT = 0.40;
+const float BASE_LENGHT = 0.38;
 ev3dev::large_motor l_motor(ev3dev::OUTPUT_B);
 ev3dev::large_motor r_motor(ev3dev::OUTPUT_C);
 
@@ -53,7 +53,7 @@ public:
         auto start = std::chrono::high_resolution_clock::now();
         int l_position_start = l_motor.position();
         int r_position_start = r_motor.position();
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         int l_position_end = l_motor.position();
         int r_position_end = r_motor.position();
         auto end = std::chrono::high_resolution_clock::now();
@@ -63,14 +63,15 @@ public:
         float r_speed = (r_position_end - r_position_start)/elapsed.count() * 1000;
 
         state.setLinearSpeed(tacho_to_si(l_speed+r_speed)/2);
+
         state.setAngularSpeed(tacho_to_si(r_speed-l_speed)/BASE_LENGHT);
         
         state.setLinearAcceleration(0.0);
         state.setAngularAcceleration(0.0);
         context.getResults().setState(state);
 
-        if((l_speed+r_speed)/2) {
-            std::cout << "state " << state.getLinearSpeed() << " " << state.getAngularSpeed() << " " << (l_speed+r_speed)/2 << std::endl;
+        if(state.getLinearSpeed() || state.getAngularSpeed()) {
+            std::cout << "state " << state.getLinearSpeed() << " " << state.getAngularSpeed() << std::endl;;
         }
 
         return kj::READY_NOW;
