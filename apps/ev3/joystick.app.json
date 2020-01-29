@@ -9,6 +9,12 @@
         "use_imu": false
       }
     },
+    "commander.robot_remote": {
+      "isaac.navigation.RobotRemoteControl": {
+        "angular_speed_max": 0.60,
+        "linear_speed_max": 0.30
+      }
+    },
     "websight": {
       "WebsightServer": {
         "webroot": "external/com_nvidia_isaac/packages/sight/webroot",
@@ -45,7 +51,6 @@
     },
     "local_map.local_map": {
       "isaac.navigation.LocalMap": {
-        "flatscan_frame": "lidar",
         "map_decay_factor": 0.98
       },
       "cleanup": {

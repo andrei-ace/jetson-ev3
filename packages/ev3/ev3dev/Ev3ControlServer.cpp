@@ -5,12 +5,26 @@
 #include "ev3dev.h"
 #include <thread>
 #include <chrono>
+#include <math.h>
 
-const uint MAX_SPEED = 900;
-const float TACHO_TO_SPEED = 0.25;
+const int MAX_SPEED = 900;
+const float TACHO_TO_SPEED = 0.000255;
 const float BASE_LENGHT = 0.40;
 ev3dev::large_motor l_motor(ev3dev::OUTPUT_B);
 ev3dev::large_motor r_motor(ev3dev::OUTPUT_C);
+
+int si_to_tacho(float speed_in_mps) {
+    int whish_speed = speed_in_mps/TACHO_TO_SPEED;
+    if(std::abs(whish_speed) > MAX_SPEED) {
+        //limit to MAX_SPEED
+        std::cerr << "MAX_SPEED exceeded! " << whish_speed << std::endl;
+        return std::copysign(MAX_SPEED, whish_speed);
+    }
+    return whish_speed;
+}
+float tacho_to_si(int speed_in_tachosps){
+    return TACHO_TO_SPEED * speed_in_tachosps;
+}
 
 class Ev3ControlServer final : public Ev3Control::Server
 {
@@ -19,12 +33,14 @@ public:
     ::kj::Promise<void> command(CommandContext context) override
     {
         auto cmd = context.getParams().getCmd();
-        // std::cout << "command " << cmd.getLinearSpeed() << " " << cmd.getAngularSpeed() << std::endl;
 
         float speed_diff = cmd.getAngularSpeed() * BASE_LENGHT;
 
-        l_motor.set_speed_sp(MAX_SPEED * (cmd.getLinearSpeed() - speed_diff/2)).run_forever();  // tacho counts per second
-        r_motor.set_speed_sp(MAX_SPEED * (cmd.getLinearSpeed() + speed_diff/2)).run_forever();  // tacho counts per second
+        if(cmd.getLinearSpeed() || cmd.getAngularSpeed()) {
+            std::cout << cmd.getLinearSpeed() << " " << cmd.getAngularSpeed()  << " move L " << si_to_tacho(cmd.getLinearSpeed() - speed_diff/2) << " R " <<  si_to_tacho(cmd.getLinearSpeed() + speed_diff/2) << std::endl;
+        }
+        l_motor.set_speed_sp(si_to_tacho(cmd.getLinearSpeed() - speed_diff/2)).run_forever();  // tacho counts per second
+        r_motor.set_speed_sp(si_to_tacho(cmd.getLinearSpeed() + speed_diff/2)).run_forever();  // tacho counts per second
         
         return kj::READY_NOW;
     }
@@ -43,18 +59,18 @@ public:
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float, std::milli> elapsed = end-start;
 
-        float l_speed = (l_position_end - l_position_start)/elapsed.count();
-        float r_speed = (r_position_end - r_position_start)/elapsed.count();
+        float l_speed = (l_position_end - l_position_start)/elapsed.count() * 1000;
+        float r_speed = (r_position_end - r_position_start)/elapsed.count() * 1000;
 
-        state.setLinearSpeed(TACHO_TO_SPEED*(l_speed+r_speed)/2);
-        state.setAngularSpeed(TACHO_TO_SPEED*(r_speed-l_speed)/BASE_LENGHT);
+        state.setLinearSpeed(tacho_to_si(l_speed+r_speed)/2);
+        state.setAngularSpeed(tacho_to_si(r_speed-l_speed)/BASE_LENGHT);
         
         state.setLinearAcceleration(0.0);
         state.setAngularAcceleration(0.0);
         context.getResults().setState(state);
 
-        if(state.getLinearSpeed() || state.getAngularSpeed()) {
-            std::cout << "state " << state.getLinearSpeed() << " " << state.getAngularSpeed() << std::endl;
+        if((l_speed+r_speed)/2) {
+            std::cout << "state " << state.getLinearSpeed() << " " << state.getAngularSpeed() << " " << (l_speed+r_speed)/2 << std::endl;
         }
 
         return kj::READY_NOW;
