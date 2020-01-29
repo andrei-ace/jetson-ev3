@@ -42,24 +42,7 @@
           }
         }
       }
-    },
-    "local_map.range_scan_to_observation_map": {
-      "isaac.navigation.RangeScanToObservationMap": {
-        "sensor_frame": "lidar",
-        "sensor_lattice_frame": "sensor_lattice"
-      }
-    },
-    "local_map.local_map": {
-      "isaac.navigation.LocalMap": {
-        "map_decay_factor": 0.98
-      },
-      "cleanup": {
-        "clear_region": [[-0.05, 0.05],[-0.05, 0.05]]
-      },
-      "isaac.navigation.BinaryToDistanceMap": {
-        "obstacle_name": ""
-      }
-    }
+    }    
   },
   "graph": {
     "nodes": [
