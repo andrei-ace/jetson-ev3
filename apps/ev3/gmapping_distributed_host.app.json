@@ -1,0 +1,98 @@
+{
+  "name": "gmapping_distributed_host",
+  "modules": [
+    "@com_nvidia_isaac//packages/lidar_slam:g_mapping"
+  ],
+  "config": {
+    "gmapping": {
+      "gmapping": {
+        "map_resolution": 0.005,
+        "map_x_max": 1,
+        "map_x_min": 1,
+        "map_y_max": 1,
+        "map_y_min": 1,
+        "use_pose_tree": false,
+        "linear_distance": 0.2,
+        "angular_distance": 0.08,
+        "max_range": 1.69,
+        "map_update_range": 1.68,
+        "number_particles": 50,
+        "laser_matcher_resolution": 0.008
+      }
+    },
+    "tcp_subscriber": {
+      "isaac.alice.TcpSubscriber": {
+        "port": 5000,
+        "host": "192.168.0.218"
+      }
+    },
+    "websight": {
+      "WebsightServer": {
+        "port": 3000,
+        "webroot": "external/com_nvidia_isaac/packages/sight/webroot",
+        "ui_config": {
+          "windows": {
+            "Mapper Ev3 - Map": {
+              "renderer": "2d",
+              "dims": {
+                "width": 600,
+                "height": 600
+              },
+              "channels": [
+                {
+                  "name": "gmapping_distributed_host/gmapping/gmapping/global_map"
+                },
+                {
+                  "name": "gmapping_distributed_host/gmapping/gmapping/fov_cone"
+                },
+                {
+                  "name": "gmapping_distributed_host/gmapping/gmapping/robot_pos"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "name": "gmapping",
+        "components": [
+          {
+            "name": "ml",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "gmapping",
+            "type": "isaac::lidar_slam::GMapping"
+          }
+        ]
+      },
+      {
+        "name": "tcp_subscriber",
+        "components": [
+          {
+            "name": "isaac.alice.MessageLedger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.alice.TcpSubscriber",
+            "type": "isaac::alice::TcpSubscriber"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "source": "tcp_subscriber/isaac.alice.TcpSubscriber/flatscan",
+        "target": "gmapping/gmapping/flatscan"
+      },
+      {
+        "source": "tcp_subscriber/isaac.alice.TcpSubscriber/odometry",
+        "target": "gmapping/gmapping/odometry"
+      }
+    ]
+  }
+}

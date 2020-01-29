@@ -1,0 +1,46 @@
+{
+  "graph": {
+    "nodes": [
+      {
+        "name": "subgraph",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "interface",
+            "type": "isaac::alice::Subgraph"
+          }
+        ]
+      },
+      {
+        "name": "ev3_hardware",
+        "subgraph": "apps/ev3/ev3_hardware.subgraph.json"
+      }
+    ],
+    "edges": [
+      {
+        "source": "subgraph/interface/base_command",
+        "target": "ev3_hardware.subgraph/interface/base_command"
+      },
+      {
+        "source": "ev3_hardware.subgraph/interface/base_state",
+        "target": "subgraph/interface/base_state"
+      },
+      {
+        "source": "ev3_hardware.subgraph/interface/scan",
+        "target": "subgraph/interface/flatscan"
+      }
+    ]
+  },
+  "config": {
+    "ev3_hardware.ydlidar": {
+      "lidar_initializer": {
+        "lhs_frame": "robot",
+        "rhs_frame": "lidar",
+        "pose": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      }
+    }
+  }
+}

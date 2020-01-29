@@ -1,0 +1,82 @@
+{
+  "modules": [
+    "@com_nvidia_isaac//packages/ydlidar",
+    "ev3"
+  ],
+  "config": {
+    "ev3": {
+      "isaac.Ev3Driver": {
+        "address": "ev3dev.local",
+        "port": 9000
+      },
+      "isaac.alice.Failsafe": {
+        "name": "robot_failsafe"
+      }
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "name": "subgraph",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "interface",
+            "type": "isaac::alice::Subgraph"
+          }
+        ]
+      },
+      {
+        "name": "ev3",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.Ev3Driver",
+            "type": "isaac::Ev3Driver"
+          },
+          {
+            "name": "isaac.alice.Failsafe",
+            "type": "isaac::alice::Failsafe"
+          }
+        ]
+      },
+      {
+        "name": "ydlidar",
+        "components": [
+          {
+            "name": "lidar_initializer",
+            "type": "isaac::alice::PoseInitializer"
+          },
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "YdLidar",
+            "type": "isaac::ydlidar::YdLidar"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "source": "subgraph/interface/base_command",
+        "target": "ev3/isaac.Ev3Driver/ev3_cmd"
+      },
+      {
+        "source": "ev3/isaac.Ev3Driver/ev3_state",
+        "target": "subgraph/interface/base_state"
+      },
+      {
+        "source": "ydlidar/YdLidar/flatscan",
+        "target": "subgraph/interface/scan"
+      }
+    ]
+  }
+}

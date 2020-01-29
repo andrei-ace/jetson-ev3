@@ -1,0 +1,149 @@
+{
+  "name": "gmapping_distributed_ev3",
+  "modules": [
+    "@com_nvidia_isaac//packages/navigation",
+    "@com_nvidia_isaac//packages/planner"
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "name": "tcp_publisher",
+        "components": [
+          {
+            "name": "isaac.alice.MessageLedger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.alice.TcpPublisher",
+            "type": "isaac::alice::TcpPublisher"
+          }
+        ]
+      },
+      {
+        "name": "shared_robot_model",
+        "components": [
+          {
+            "name": "RangeScanModel",
+            "type": "isaac::navigation::RangeScanModelFlatloc"
+          },
+          {
+            "name": "SphericalRobotShapeComponent",
+            "type": "isaac::planner::SphericalRobotShapeComponent"
+          }
+        ]
+      },
+      {
+       "name": "obstacle_atlas",
+       "components": [
+         {
+           "name": "obstacle_atlas",
+           "type": "isaac::map::ObstacleAtlas"
+         }
+       ]
+      },
+      {
+        "name": "2d_ev3",
+        "subgraph": "apps/ev3/2d_ev3.subgraph.json"
+      },
+      {
+        "name": "commander",
+        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_commander.subgraph.json"
+      },
+      {
+        "name": "odometry",
+        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_imu_odometry.subgraph.json"
+      },
+      {
+        "name": "local_map",
+        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/local_map.subgraph.json"
+      }
+    ],
+    "edges": [
+      {
+        "source": "commander.subgraph/interface/command",
+        "target": "2d_ev3.subgraph/interface/base_command"
+      },
+      {
+        "source": "2d_ev3.subgraph/interface/base_state",
+        "target": "odometry.subgraph/interface/state"
+      },
+      {
+        "source": "2d_ev3.subgraph/interface/flatscan",
+        "target": "local_map.subgraph/interface/flatscan"
+      },
+      {
+        "source": "2d_ev3.subgraph/interface/flatscan",
+        "target": "tcp_publisher/isaac.alice.TcpPublisher/flatscan"
+      },
+      {
+        "source": "odometry.subgraph/interface/odometry",
+        "target": "tcp_publisher/isaac.alice.TcpPublisher/odometry"
+      }
+    ]
+  },
+  "config": {
+    "local_map.range_scan_to_observation_map": {
+      "isaac.navigation.RangeScanToObservationMap": {
+        "sensor_frame": "lidar",
+        "sensor_lattice_frame": "sensor_lattice"
+      }
+    },
+    "local_map.local_map": {
+      "isaac.navigation.LocalMap": {
+        "flatscan_frame": "robot",
+        "map_decay_factor": 0.98
+      },
+      "cleanup": {
+        "clear_region": [[-0.05, 0.05],[-0.05, 0.05]]
+      },
+      "isaac.navigation.BinaryToDistanceMap": {
+        "obstacle_name": ""
+      }
+    },
+    "tcp_publisher": {
+      "isaac.alice.TcpPublisher": {
+        "port": 5000
+      }
+    },
+    "commander.robot_remote": {
+      "isaac.navigation.RobotRemoteControl": {
+        "angular_speed_max": 0.60,
+        "linear_speed_max": 0.30
+      }
+    },
+    "odometry.odometry": {
+      "DifferentialBaseWheelImuOdometry": {
+        "use_imu": false
+      }
+    },
+    "websight": {
+      "WebsightServer": {
+        "port": 3000,
+        "webroot": "external/com_nvidia_isaac/packages/sight/webroot",
+        "ui_config": {
+          "windows": {
+            "Mapper Ev3 - Local View": {
+              "renderer": "2d",
+              "dims": {
+                "width": 256,
+                "height": 256
+              },
+              "zoom": 2.0,
+              "channels": [
+                { "name": "gmapping_distributed_ev3/local_map.local_map/isaac.navigation.LocalMap/local_map" }
+              ]
+            },
+            "Mapper Ev3 - Odometry": {
+              "renderer": "plot",
+              "channels": [
+                { "name": "gmapping_distributed_ev3/odometry.odometry/DiferentialBaseWheelImuOdometry/state.heading" },
+                { "name": "gmapping_distributed_ev3/odometry.odometry/DiferentialBaseWheelImuOdometry/state.pos_x" },
+                { "name": "gmapping_distributed_ev3/odometry.odometry/DiferentialBaseWheelImuOdometry/state.pos_y" }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

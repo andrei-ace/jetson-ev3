@@ -1,0 +1,102 @@
+{
+  "name": "joystick",
+  "modules": [
+    "@com_nvidia_isaac//packages/navigation"
+  ],
+  "config": {
+    "odometry.odometry": {
+      "DifferentialBaseWheelImuOdometry": {
+        "use_imu": false
+      }
+    },
+    "websight": {
+      "WebsightServer": {
+        "webroot": "external/com_nvidia_isaac/packages/sight/webroot",
+        "ui_config": {
+          "windows": {
+            "Mapper Ev3 - Local View": {
+              "renderer": "2d",
+              "dims": {
+                "width": 256,
+                "height": 256
+              },
+              "zoom": 4.0,
+              "channels": [
+                { "name": "joystick/local_map.local_map/isaac.navigation.LocalMap/local_map" }
+              ]
+            },
+            "Mapper Ev3 - Odometry": {
+              "renderer": "plot",
+              "channels": [
+                { "name": "joystick/odometry.odometry/DiferentialBaseWheelImuOdometry/state.heading" },
+                { "name": "joystick/odometry.odometry/DiferentialBaseWheelImuOdometry/state.pos_x" },
+                { "name": "joystick/odometry.odometry/DiferentialBaseWheelImuOdometry/state.pos_y" }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "local_map.range_scan_to_observation_map": {
+      "isaac.navigation.RangeScanToObservationMap": {
+        "sensor_frame": "lidar",
+        "sensor_lattice_frame": "sensor_lattice"
+      }
+    },
+    "local_map.local_map": {
+      "isaac.navigation.LocalMap": {
+        "flatscan_frame": "lidar",
+        "map_decay_factor": 0.98
+      },
+      "cleanup": {
+        "clear_region": [[-0.05, 0.05],[-0.05, 0.05]]
+      },
+      "isaac.navigation.BinaryToDistanceMap": {
+        "obstacle_name": ""
+      }
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "name": "obstacle_atlas",
+        "components": [
+          {
+            "name": "obstacle_atlas",
+            "type": "isaac::map::ObstacleAtlas"
+          }
+        ]
+       },
+       {
+         "name": "2d_ev3",
+         "subgraph": "apps/ev3/2d_ev3.subgraph.json"
+       },
+       {
+         "name": "commander",
+         "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_commander.subgraph.json"
+       },
+       {
+         "name": "odometry",
+         "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_imu_odometry.subgraph.json"
+       },
+       {
+         "name": "local_map",
+         "subgraph": "@com_nvidia_isaac//packages/navigation/apps/local_map.subgraph.json"
+       }
+    ],
+    "edges": [
+      {
+        "source": "commander.subgraph/interface/command",
+        "target": "2d_ev3.subgraph/interface/base_command"
+      },
+      {
+        "source": "2d_ev3.subgraph/interface/base_state",
+        "target": "odometry.subgraph/interface/state"
+      },
+      {
+        "source": "2d_ev3.subgraph/interface/flatscan",
+        "target": "local_map.subgraph/interface/flatscan"
+      }
+    ]
+  }
+}
