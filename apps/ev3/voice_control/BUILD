@@ -23,7 +23,7 @@ isaac_cc_module(
         "VoiceControlGoalGenerator.hpp"
     ],
     visibility = ["//visibility:public"],
-    deps = ["@com_nvidia_isaac//engine/core/image",],
+    deps = [],
 )
 
 isaac_app(
@@ -34,8 +34,7 @@ isaac_app(
         "@com_nvidia_isaac//packages/navigation/apps:differential_base_commander_subgraph",
         "@com_nvidia_isaac//packages/navigation/apps:differential_base_imu_odometry_subgraph",
         "@com_nvidia_isaac//packages/navigation/apps:local_map_subgraph",
-        "@com_nvidia_isaac//packages/navigation/apps:go_to_subgraph",        
-        "@com_nvidia_isaac//packages_jetpack43/audio:libaudio_module.so_release",
+        "@com_nvidia_isaac//packages/navigation/apps:go_to_subgraph"
     ],
     modules = [
         "//apps/ev3/voice_control:voice_control_goal_generator",
