@@ -1,0 +1,25 @@
+tensorflow-gpu==1.15.0
+pycapnp>=0.6.3
+keras
+Pillow
+psutil>=5.6.3
+scipy
+gym==0.10.5
+graphviz
+nltk
+onnx==1.4.1
+onnxmltools
+tf2onnx
+
+# Deps for voice command training app
+h5py
+librosa>=0.6.3
+numpy
+scikit-learn
+SoundFile>=0.10.2
+tqdm
+
+# Deps for object detection evaluation
+matplotlib==3.1.0
+pandas
+seaborn

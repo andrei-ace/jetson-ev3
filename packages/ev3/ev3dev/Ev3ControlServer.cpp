@@ -39,8 +39,8 @@ public:
         if(cmd.getLinearSpeed() || cmd.getAngularSpeed()) {
             std::cout << cmd.getLinearSpeed() << " " << cmd.getAngularSpeed()  << " move L " << si_to_tacho(cmd.getLinearSpeed() - speed_diff/2) << " R " <<  si_to_tacho(cmd.getLinearSpeed() + speed_diff/2) << std::endl;
         }
-        l_motor.set_speed_sp(si_to_tacho(cmd.getLinearSpeed() - speed_diff/2)).run_forever();  // tacho counts per second
-        r_motor.set_speed_sp(si_to_tacho(cmd.getLinearSpeed() + speed_diff/2)).run_forever();  // tacho counts per second
+        l_motor.set_speed_sp(si_to_tacho(cmd.getLinearSpeed() - speed_diff/2)).set_time_sp(500).run_timed();  // tacho counts per second
+        r_motor.set_speed_sp(si_to_tacho(cmd.getLinearSpeed() + speed_diff/2)).set_time_sp(500).run_timed();  // tacho counts per second
         
         return kj::READY_NOW;
     }

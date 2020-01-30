@@ -3,6 +3,7 @@ load("@com_nvidia_isaac//engine/build:isaac.bzl", "isaac_app", "isaac_subgraph")
 isaac_subgraph(
     name = "ev3_hardware_subgraph",
     modules = [
+        "@com_nvidia_isaac//packages/navigation",
         "@com_nvidia_isaac//packages/ydlidar",
         "ev3"
     ],
@@ -77,5 +78,6 @@ isaac_app(
         "@com_nvidia_isaac//packages/planner"
     ],
 )
+
 
 

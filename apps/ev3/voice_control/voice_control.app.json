@@ -1,0 +1,131 @@
+{
+  "name": "voice_control",
+  "modules": [
+    "//apps/ev3/voice_control:voice_control_goal_generator"
+  ],
+  "config": {
+      "odometry.odometry": {
+        "DifferentialBaseWheelImuOdometry": {
+          "use_imu": false
+        }
+      },
+      "commander.robot_remote": {
+        "isaac.navigation.RobotRemoteControl": {
+          "angular_speed_max": 0.6,
+          "linear_speed_max": 0.3
+        }
+      },
+      "websight": {
+        "WebsightServer": {
+          "webroot": "external/com_nvidia_isaac/packages/sight/webroot",
+          "ui_config": {
+            "windows": {
+              "Mapper Ev3 - Local View": {
+                "renderer": "2d",
+                "dims": {
+                  "width": 256,
+                  "height": 256
+                },
+                "zoom": 4.0,
+                "channels": [
+                  {
+                    "name": "joystick/local_map.local_map/isaac.navigation.LocalMap/local_map"
+                  }
+                ]
+              },
+              "Mapper Ev3 - Odometry": {
+                "renderer": "plot",
+                "channels": [
+                  {
+                    "name": "joystick/odometry.odometry/DifferentialBaseWheelImuOdometry/state.heading"
+                  },
+                  {
+                    "name": "joystick/odometry.odometry/DifferentialBaseWheelImuOdometry/state.pos_x"
+                  },
+                  {
+                    "name": "joystick/odometry.odometry/DifferentialBaseWheelImuOdometry/state.pos_y"
+                  }
+                ]
+              }
+            }
+          }
+        }
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "name": "obstacle_atlas",
+        "components": [
+          {
+            "name": "obstacle_atlas",
+            "type": "isaac::map::ObstacleAtlas"
+          }
+        ]
+      },
+      {
+        "name": "voice_control_component",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "goal_generator",
+            "type": "isaac::VoiceControlGoalGenerator"
+          }
+        ]
+      },
+      {
+        "name": "voice_detection",
+        "subgraph": "apps/ev3/voice_control/voice_command_detection.subgraph.json"
+      },
+      {
+        "name": "2d_ev3",
+        "subgraph": "apps/ev3/2d_ev3.subgraph.json"
+      },
+      {
+        "name": "commander",
+        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_commander.subgraph.json"
+      },
+      {
+        "name": "odometry",
+        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_imu_odometry.subgraph.json"
+      },
+      {
+        "name": "local_map",
+        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/local_map.subgraph.json"
+      },
+      {
+        "name": "go_to",
+        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/go_to.subgraph.json"
+      }
+    ],
+    "edges": [
+      {
+        "source": "voice_detection.subgraph/interface/voice_command_id",
+        "target": "voice_control_component/goal_generator/voice_command_id"
+      },
+      {
+        "source": "commander.subgraph/interface/command",
+        "target": "2d_ev3.subgraph/interface/base_command"
+      },
+      {
+        "source": "2d_ev3.subgraph/interface/base_state",
+        "target": "odometry.subgraph/interface/state"
+      },
+      {
+        "source": "2d_ev3.subgraph/interface/flatscan",
+        "target": "local_map.subgraph/interface/flatscan"
+      },
+      {
+        "source": "odometry.subgraph/interface/odometry",
+        "target": "go_to.subgraph/interface/odometry"
+      },
+      {
+        "source": "voice_control_component/goal_generator/goal",
+        "target": "go_to.subgraph/interface/goal"
+      }
+    ]
+  }
+}

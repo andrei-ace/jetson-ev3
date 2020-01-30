@@ -29,7 +29,12 @@
           {
             "name": "SphericalRobotShapeComponent",
             "type": "isaac::planner::SphericalRobotShapeComponent"
+          },
+          {
+            "name": "DifferentialBaseModel",
+            "type": "isaac::planner::DifferentialBaseModel"
           }
+          
         ]
       },
       {
