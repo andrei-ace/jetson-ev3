@@ -1,23 +1,8 @@
 {
-  "modules": [
-    "@com_nvidia_isaac//packages/audio",
-    "@com_nvidia_isaac//packages/ml:tensorflow"
-  ],
+  "name": "jetbot",
+  "modules": ["@com_nvidia_isaac//packages/audio", "@com_nvidia_isaac//packages/ml:tensorflow"],
   "graph": {
     "nodes": [
-      {
-        "name": "subgraph",
-        "components": [
-          {
-            "name": "message_ledger",
-            "type": "isaac::alice::MessageLedger"
-          },
-          {
-            "name": "interface",
-            "type": "isaac::alice::Subgraph"
-          }
-        ]
-      },
       {
         "name": "audio_capture",
         "components": [
@@ -65,13 +50,11 @@
       {
         "source": "voice_command_detector/isaac.ml.TensorflowInference/output_tensors",
         "target": "voice_command_detector/isaac.audio.VoiceCommandConstruction/keyword_probabilities"
-      },
-      {
-        "source": "voice_command_detector/isaac.audio.VoiceCommandConstruction/voice_command_id",
-        "target": "subgraph/interface/voice_command_id"
       }
     ]
   },
+
+  "config_files": ["apps/jetbot/model/isaac_vcd_model.metadata.json"],
   "config": {
     "audio_capture": {
       "isaac.audio.AudioCapture": {
@@ -87,8 +70,8 @@
         "minimum_time_between_inferences": 0.1
       },
       "isaac.ml.TensorflowInference": {
-        "model_file_path": "apps/ev3/voice_control/model/isaac_vcd_model.pb",
-        "config_file_path": "apps/ev3/voice_control/model/isaac_vcd_config.pb"
+        "model_file_path": "apps/jetbot/model/isaac_vcd_model.pb",
+        "config_file_path": "apps/jetbot/model/isaac_vcd_config.pb"
       },
       "isaac.audio.VoiceCommandConstruction": {
         "command_list": [
@@ -98,6 +81,30 @@
         ],
         "command_ids": [0, 1, 2],
         "max_frames_allowed_after_keyword_detected": 14
+      }
+    },
+    "websight": {
+      "WebsightServer": {
+        "port": 3000,
+        "webroot": "external/com_nvidia_isaac/packages/sight/webroot",
+        "ui_config": {
+          "windows": {
+            "Voice Command Detection": {
+              "renderer": "plot",
+              "dims": {
+                "width": 1024,
+                "height": 256
+              },
+              "channels": [
+                {
+                  "name": "jetbot/voice_command_detector/isaac.audio.VoiceCommandConstruction/voice_command_id",
+                  "active": true
+                }
+              ]
+            }
+          },
+          "assets": {}
+        }
       }
     }
   }

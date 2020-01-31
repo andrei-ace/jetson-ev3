@@ -1,26 +1,41 @@
 {
   "name": "voice_control",
   "modules": [
-    "//apps/ev3/voice_control:voice_control_goal_generator"
+    "//apps/ev3/voice_control:voice_control_goal_generator",
+    "@com_nvidia_isaac//packages/planner"
   ],
+  "config_files": ["apps/ev3/voice_control/model/isaac_vcd_model.metadata.json"],
   "config": {
-      "odometry.odometry": {
-        "DifferentialBaseWheelImuOdometry": {
-          "use_imu": false
-        }
-      },
-      "commander.robot_remote": {
-        "isaac.navigation.RobotRemoteControl": {
-          "angular_speed_max": 0.6,
-          "linear_speed_max": 0.3
-        }
-      },
-      "websight": {
-        "WebsightServer": {
-          "webroot": "external/com_nvidia_isaac/packages/sight/webroot",
-          "ui_config": {
-            "windows": {
-              "Mapper Ev3 - Local View": {
+    "odometry.odometry": {
+      "DifferentialBaseWheelImuOdometry": {
+        "use_imu": false
+      }
+    },
+    "commander.robot_remote": {
+      "isaac.navigation.RobotRemoteControl": {
+        "angular_speed_max": 0.6,
+        "linear_speed_max": 0.3
+      }
+    },
+    "websight": {
+      "WebsightServer": {
+        "webroot": "external/com_nvidia_isaac/packages/sight/webroot",
+        "ui_config": {
+          "windows": {
+            "Voice Command Detection": {
+              "renderer": "plot",
+              "dims": {
+                "width": 400,
+                "height": 200
+              },
+              "channels": [
+                {
+                  "name": "voice_control/voice_detection.voice_command_detector/isaac.audio.VoiceCommandConstruction/voice_command_id",
+                  "active": true
+                }
+              ]
+            },
+            "Ev3 - Local View": {
                 "renderer": "2d",
                 "dims": {
                   "width": 256,
@@ -29,29 +44,48 @@
                 "zoom": 4.0,
                 "channels": [
                   {
-                    "name": "joystick/local_map.local_map/isaac.navigation.LocalMap/local_map"
+                    "name": "voice_control/local_map.local_map/isaac.navigation.LocalMap/local_map"
                   }
                 ]
-              },
-              "Mapper Ev3 - Odometry": {
+              },              
+              "Ev3 - Odometry": {
                 "renderer": "plot",
                 "channels": [
                   {
-                    "name": "joystick/odometry.odometry/DifferentialBaseWheelImuOdometry/state.heading"
+                    "name": "voice_control/odometry.odometry/DifferentialBaseWheelImuOdometry/state.heading"
                   },
                   {
-                    "name": "joystick/odometry.odometry/DifferentialBaseWheelImuOdometry/state.pos_x"
+                    "name": "voice_control/odometry.odometry/DifferentialBaseWheelImuOdometry/state.pos_x"
                   },
                   {
-                    "name": "joystick/odometry.odometry/DifferentialBaseWheelImuOdometry/state.pos_y"
+                    "name": "voice_control/odometry.odometry/DifferentialBaseWheelImuOdometry/state.pos_y"
                   }
                 ]
-              }
             }
           }
         }
+      }
+    },
+    "shared_robot_model": {
+      "DifferentialBaseModel": {
+        "robot_radius": 0.5,
+        "base_length": 0.38,
+        "wheel_radius": 0.125
+      }
+    },
+    "navigation_mode": {
+      "isaac.navigation.GroupSelectorBehavior": {
+        "behavior_map": {
+          "navigate": [
+          ],
+          "stop": [
+          ]
+        },
+        "desired_behavior": "navigate",
+        "tick_period": "50ms"
+      }
     }
-  },
+  },  
   "graph": {
     "nodes": [
       {
@@ -60,6 +94,32 @@
           {
             "name": "obstacle_atlas",
             "type": "isaac::map::ObstacleAtlas"
+          }
+        ]
+       },
+       {
+        "name": "navigation_mode",
+        "components": [
+          {
+            "name": "isaac.navigation.GroupSelectorBehavior",
+            "type": "isaac::navigation::GroupSelectorBehavior"
+          },
+          {
+            "name": "isaac.alice.Behavior",
+            "type": "isaac::alice::Behavior"
+          }
+        ]
+      },
+      {
+        "name": "shared_robot_model",
+        "components": [
+          {
+            "name": "DifferentialBaseModel",
+            "type": "isaac::planner::DifferentialBaseModel"
+          },
+          {
+            "name": "SphericalRobotShapeComponent",
+            "type": "isaac::planner::SphericalRobotShapeComponent"
           }
         ]
       },

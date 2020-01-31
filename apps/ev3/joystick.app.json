@@ -1,6 +1,8 @@
 {
   "name": "joystick",
   "modules": [
+    "ev3",
+    "@com_nvidia_isaac//packages/ydlidar",
     "@com_nvidia_isaac//packages/navigation"
   ],
   "config": {

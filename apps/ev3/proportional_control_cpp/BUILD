@@ -8,7 +8,7 @@ distribution of this software and related documentation without an express
 license agreement from NVIDIA CORPORATION is strictly prohibited.
 """
 
-load("//engine/build:isaac.bzl", "isaac_app", "isaac_cc_module")
+load("@com_nvidia_isaac//engine/build:isaac.bzl", "isaac_app", "isaac_cc_module")
 
 isaac_cc_module(
     name = "proportional_control_cpp_codelet",

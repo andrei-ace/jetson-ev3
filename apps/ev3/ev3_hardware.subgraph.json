@@ -1,8 +1,7 @@
 {
   "modules": [
-    "@com_nvidia_isaac//packages/ydlidar",
-    "@com_nvidia_isaac//packages/navigation",
-    "ev3"
+    "ev3",
+    "@com_nvidia_isaac//packages/ydlidar"
   ],
   "config": {
     "ev3": {
@@ -12,13 +11,6 @@
       },
       "isaac.alice.Failsafe": {
         "name": "robot_failsafe"
-      }
-    },
-    "shared_robot_model": {
-      "DifferentialBaseModel": {
-        "robot_radius": 0.5,
-        "base_length": 0.38,
-        "wheel_radius": 0.125
       }
     }
   },
@@ -34,23 +26,6 @@
           {
             "name": "interface",
             "type": "isaac::alice::Subgraph"
-          }
-        ]
-      },
-      {
-        "name": "shared_robot_model",
-        "components": [
-          {
-            "name": "DifferentialBaseModel",
-            "type": "isaac::planner::DifferentialBaseModel"
-          },
-          {
-            "name": "RangeScanModel",
-            "type": "isaac::navigation::RangeScanModelFlatloc"
-          },
-          {
-            "name": "SphericalRobotShapeComponent",
-            "type": "isaac::planner::SphericalRobotShapeComponent"
           }
         ]
       },

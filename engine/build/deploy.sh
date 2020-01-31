@@ -171,6 +171,8 @@ cp $BAZEL_BIN/$PREFIX/$TAR /tmp/
 rm -rf /tmp/$TARGET
 mkdir /tmp/$TARGET
 tar -xf /tmp/$TAR -C /tmp/$TARGET
+# fixing libary loading issues where libraries from _solib_arm64-v8a are loaded before the Isaac libraries
+mv /tmp/$TARGET/_solib_arm64-v8a/ /tmp/$TARGET/external/com_nvidia_isaac/
 
 # Deploy directory
 if [ -z "$DEPLOY_PATH" ]
@@ -208,6 +210,8 @@ else
   rm -rf /tmp/$TARGET
   mkdir /tmp/$TARGET
   tar -xf /tmp/$TAR -C /tmp/$TARGET
+  # fixing libary loading issues where libraries from _solib_arm64-v8a are loaded before the Isaac libraries
+  mv /tmp/$TARGET/_solib_arm64-v8a/ /tmp/$TARGET/external/com_nvidia_isaac/
 
   EXECUTABLES=$(find /tmp/$TARGET -executable -type f)
   for exe in $EXECUTABLES

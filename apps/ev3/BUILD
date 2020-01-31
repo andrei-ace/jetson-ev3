@@ -3,7 +3,6 @@ load("@com_nvidia_isaac//engine/build:isaac.bzl", "isaac_app", "isaac_subgraph")
 isaac_subgraph(
     name = "ev3_hardware_subgraph",
     modules = [
-        "@com_nvidia_isaac//packages/navigation",
         "@com_nvidia_isaac//packages/ydlidar",
         "ev3"
     ],
@@ -48,12 +47,9 @@ isaac_app(
         "@com_nvidia_isaac//packages/navigation/apps:local_map_subgraph",
     ],
     modules = [
-        "@com_nvidia_isaac//packages/navigation",
-        "@com_nvidia_isaac//packages/perception",
-        "@com_nvidia_isaac//packages/planner",
-        "@com_nvidia_isaac//packages/sensors:joystick",
-        "@com_nvidia_isaac//packages/ydlidar",
         "ev3",
+        "@com_nvidia_isaac//packages/ydlidar",
+        "@com_nvidia_isaac//packages/navigation"
     ],
 )
 
@@ -74,7 +70,6 @@ isaac_app(
     ],
     modules = [
         "@com_nvidia_isaac//packages/navigation",
-        "@com_nvidia_isaac//packages/perception",
         "@com_nvidia_isaac//packages/planner"
     ],
 )

@@ -2,7 +2,7 @@ workspace(name = "jetson_ev3")
 
 local_repository(
     name = "com_nvidia_isaac",
-    path = "/home/andrei/ml/isaac"
+    path = "/home/andrei/ml/isaac-sdk-20191213-65ec14db"
 )
 
 load("@com_nvidia_isaac//engine/build:isaac.bzl", "isaac_git_repository", "isaac_new_http_archive")

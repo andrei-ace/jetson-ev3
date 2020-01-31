@@ -1,0 +1,57 @@
+{
+  "voice_command_detector": {
+    "isaac.audio.VoiceCommandFeatureExtraction": {
+      "sample_rate": 16000,
+      "fft_length": 400,
+      "num_mels": 40,
+      "hop_size": 200,
+      "window_length": 55,
+      "num_classes": 4,
+      "classes": [
+        "jetson",
+        "left",
+        "right",
+        "unknownkeywords"
+      ]
+    },
+    "isaac.ml.TensorflowInference": {
+      "input_tensor_info": [
+        {
+          "ops_name": "input_node",
+          "index": 0,
+          "dims": [
+            1,
+            55,
+            40,
+            3
+          ]
+        }
+      ],
+      "output_tensor_info": [
+        {
+          "ops_name": "output_node",
+          "index": 0,
+          "dims": [
+            1,
+            4
+          ]
+        }
+      ]
+    },
+    "isaac.audio.VoiceCommandConstruction": {
+      "num_classes": 4,
+      "classes": [
+        "jetson",
+        "left",
+        "right",
+        "unknownkeywords"
+      ],
+      "thresholds": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    }
+  }
+}
