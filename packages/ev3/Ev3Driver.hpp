@@ -33,8 +33,6 @@ public:
 
 private:
     alice::Failsafe* failsafe_;
-    
-    ::kj::Promise<void> sendCommand(double linearSpeed, double angularSpeed, Ev3Control::Client*); 
 };
 } // namespace isaac
 

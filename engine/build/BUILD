@@ -7,3 +7,10 @@ and any modifications thereto. Any use, reproduction, disclosure or
 distribution of this software and related documentation without an express
 license agreement from NVIDIA CORPORATION is strictly prohibited.
 '''
+
+py_runtime(
+    name = "python3",
+    files = [],
+    interpreter_path = "/usr/bin/python3",
+    visibility = ["//visibility:public"],
+)

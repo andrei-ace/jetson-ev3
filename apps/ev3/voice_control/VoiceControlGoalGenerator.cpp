@@ -2,41 +2,63 @@
 
 #include "messages/math.hpp"
 
+namespace isaac
+{
 
-namespace isaac {
-
-void VoiceControlGoalGenerator::start() {
-  tickOnMessage(rx_voice_command_id());
+void VoiceControlGoalGenerator::start()
+{
+  tickOnMessage(rx_detected_command());
 }
 
-void VoiceControlGoalGenerator::tick() {
-  LOG_INFO("Message");
-  auto proto = rx_voice_command_id().getProto();
-  int id = proto.getCommandId();
+void VoiceControlGoalGenerator::publish_goal(Pose2d pose)
+{
   auto goal_proto = tx_goal().initProto();
-  switch (id)
+  goal_proto.setStopRobot(false);
+  goal_proto.setTolerance(0.1);
+  goal_proto.setGoalFrame("robot");
+  ToProto(pose, goal_proto.initGoal());
+  tx_goal().publish();
+}
+
+void VoiceControlGoalGenerator::tick()
+{
+
+  if (rx_detected_command().available())
   {
-  case 1:
-    goal_proto.setStopRobot(true);
-    goal_proto.setTolerance(0.1);
-    goal_proto.setGoalFrame("robot");
-    ToProto(Pose2d::Rotation(90), goal_proto.initGoal());
-    LOG_INFO("Go Left");
-    tx_goal().publish();
-    break;
-  case 2:
-    goal_proto.setStopRobot(true);
-    goal_proto.setTolerance(0.1);
-    goal_proto.setGoalFrame("robot");
-    ToProto(Pose2d::Rotation(-90), goal_proto.initGoal());
-    LOG_INFO("Go Right");
-    tx_goal().publish();
-    break;
-  
-  default:
-    break;
+    auto proto = rx_detected_command().getProto();
+    int id = proto.getCommandId();
+
+    switch (id)
+    {
+    case 1:
+      LOG_INFO("Go Left");
+      publish_goal(Pose2d::Rotation(M_PI_2));
+      // publish_goal(Pose2d::Translation(1.0,1.0));
+      break;
+    case 2:
+      LOG_INFO("Go Right");
+      publish_goal(Pose2d::Rotation(-M_PI_2));
+      // publish_goal(Pose2d::Translation(1.0,-1.0));
+      break;
+
+    default:
+      break;
+    }
   }
 
+  // Process feedback
+  rx_feedback().processLatestNewMessage(
+      [this](auto feedback_proto, int64_t pubtime, int64_t acqtime) {
+        // // Check if this feedback is associated with the last goal we transmitted
+        // if (goal_timestamp_ != acqtime)
+        // {
+        //   return;
+        // }
+        const bool arrived = feedback_proto.getHasArrived();
+        LOG_INFO("Arrived!");
+        // Show arrival information on WebSight
+        show("arrived", arrived ? 1.0 : 0.0);
+      });
 }
 
-}  // namespace isaac
+} // namespace isaac

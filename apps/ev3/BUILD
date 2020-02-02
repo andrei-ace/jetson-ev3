@@ -64,6 +64,7 @@ isaac_app(
     name = "gmapping_distributed_ev3",
     data = [
         ":2d_ev3_subgraph",
+        "@com_nvidia_isaac//packages/navigation/apps:differential_base_control_subgraph",
         "@com_nvidia_isaac//packages/navigation/apps:differential_base_commander_subgraph",
         "@com_nvidia_isaac//packages/navigation/apps:differential_base_imu_odometry_subgraph",
         "@com_nvidia_isaac//packages/navigation/apps:local_map_subgraph",

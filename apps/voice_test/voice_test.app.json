@@ -1,5 +1,5 @@
 {
-  "name": "jetbot",
+  "name": "voice_test",
   "modules": ["@com_nvidia_isaac//packages/audio", "@com_nvidia_isaac//packages/ml:tensorflow"],
   "graph": {
     "nodes": [
@@ -70,8 +70,8 @@
         "minimum_time_between_inferences": 0.1
       },
       "isaac.ml.TensorflowInference": {
-        "model_file_path": "apps/jetbot/model/isaac_vcd_model.pb",
-        "config_file_path": "apps/jetbot/model/isaac_vcd_config.pb"
+        "model_file_path": "apps/voice_test/model/isaac_vcd_model.pb",
+        "config_file_path": "apps/voice_test/model/isaac_vcd_config.pb"
       },
       "isaac.audio.VoiceCommandConstruction": {
         "command_list": [
@@ -97,7 +97,7 @@
               },
               "channels": [
                 {
-                  "name": "jetbot/voice_command_detector/isaac.audio.VoiceCommandConstruction/voice_command_id",
+                  "name": "voice_test/voice_command_detector/isaac.audio.VoiceCommandConstruction/voice_command_id",
                   "active": true
                 }
               ]

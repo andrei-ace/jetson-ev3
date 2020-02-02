@@ -16,28 +16,26 @@ isaac_cc_module(
     hdrs = [
         "VoiceControlGoalGenerator.hpp"
     ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "@com_nvidia_isaac//engine/gems/state:io",
-    ],
+    visibility = ["//visibility:public"]
 )
 
 isaac_app(
     name = "voice_control",
     data = [
+        "maps",
         "voice_command_detection.subgraph.json",
         "model/isaac_vcd_model.pb",
         "model/isaac_vcd_model.metadata.json",
         "model/isaac_vcd_config.pb",
         "//apps/ev3:2d_ev3_subgraph",
         "@com_nvidia_isaac//packages/navigation/apps:differential_base_commander_subgraph",
-        "@com_nvidia_isaac//packages/navigation/apps:local_map_subgraph",
-        "@com_nvidia_isaac//packages/navigation/apps:go_to_subgraph"    ],
+        "@com_nvidia_isaac//packages/navigation/apps:differential_base_navigation_subgraph",
+    ],
     modules = [
         "//apps/ev3/voice_control:voice_control_goal_generator",
         "@com_nvidia_isaac//packages/audio",
         "@com_nvidia_isaac//packages/ml:tensorflow",
         "@com_nvidia_isaac//packages/navigation",
-        "@com_nvidia_isaac//packages/planner",
+        "@com_nvidia_isaac//packages/planner"
     ]
 )

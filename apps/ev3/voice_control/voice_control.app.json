@@ -2,11 +2,20 @@
   "name": "voice_control",
   "modules": [
     "//apps/ev3/voice_control:voice_control_goal_generator",
+    "@com_nvidia_isaac//packages/navigation",
     "@com_nvidia_isaac//packages/planner"
   ],
-  "config_files": ["apps/ev3/voice_control/model/isaac_vcd_model.metadata.json"],
+  "config_files": [
+    "apps/ev3/voice_control/model/isaac_vcd_model.metadata.json"
+  ],
   "config": {
-    "odometry.odometry": {
+    "2d_ev3.ev3_hardware.ev3": {
+      "isaac.Ev3Driver": {
+        "address": "ev3dev.local",
+        "port": 9000
+      }
+    },
+    "navigation.imu_odometry.odometry": {
       "DifferentialBaseWheelImuOdometry": {
         "use_imu": false
       }
@@ -34,97 +43,39 @@
                   "active": true
                 }
               ]
-            },
-            "Ev3 - Local View": {
-                "renderer": "2d",
-                "dims": {
-                  "width": 256,
-                  "height": 256
-                },
-                "zoom": 4.0,
-                "channels": [
-                  {
-                    "name": "voice_control/local_map.local_map/isaac.navigation.LocalMap/local_map"
-                  }
-                ]
-              },              
-              "Ev3 - Odometry": {
-                "renderer": "plot",
-                "channels": [
-                  {
-                    "name": "voice_control/odometry.odometry/DifferentialBaseWheelImuOdometry/state.heading"
-                  },
-                  {
-                    "name": "voice_control/odometry.odometry/DifferentialBaseWheelImuOdometry/state.pos_x"
-                  },
-                  {
-                    "name": "voice_control/odometry.odometry/DifferentialBaseWheelImuOdometry/state.pos_y"
-                  }
-                ]
             }
           }
         }
       }
     },
-    "shared_robot_model": {
-      "DifferentialBaseModel": {
-        "robot_radius": 0.5,
-        "base_length": 0.38,
-        "wheel_radius": 0.125
+    "navigation.shared_robot_model": {
+      "SphericalRobotShapeComponent": {
+        "circles": [
+          { "center": [0.0, 0.0], "radius": 0.075 },
+          { "center": [0.02, 0.03464], "radius": 0.055 },
+          { "center": [0.02, -0.03464], "radius": 0.055 },
+          { "center": [-0.04, 0.0], "radius": 0.055 },
+          { "center": [0.0525, 0.09093], "radius": 0.035 },
+          { "center": [0.0525, -0.09093], "radius": 0.035 },
+          { "center": [-0.105, 0.0], "radius": 0.035 }
+        ]
       }
     },
-    "navigation_mode": {
-      "isaac.navigation.GroupSelectorBehavior": {
-        "behavior_map": {
-          "navigate": [
-          ],
-          "stop": [
-          ]
-        },
-        "desired_behavior": "navigate",
-        "tick_period": "50ms"
+    "navigation.control.lqr": {
+      "isaac.planner.DifferentialBaseLqrPlanner": {
+        "manual_mode_channel": "commander.robot_remote/isaac.navigation.RobotRemoteControl/manual_mode"
+      }
+    },
+    "navigation.control.control": {
+      "isaac.planner.DifferentialBaseControl": {
+        "manual_mode_channel": "commander.robot_remote/isaac.navigation.RobotRemoteControl/manual_mode"
       }
     }
-  },  
+  },
   "graph": {
     "nodes": [
       {
-        "name": "obstacle_atlas",
-        "components": [
-          {
-            "name": "obstacle_atlas",
-            "type": "isaac::map::ObstacleAtlas"
-          }
-        ]
-       },
-       {
-        "name": "navigation_mode",
-        "components": [
-          {
-            "name": "isaac.navigation.GroupSelectorBehavior",
-            "type": "isaac::navigation::GroupSelectorBehavior"
-          },
-          {
-            "name": "isaac.alice.Behavior",
-            "type": "isaac::alice::Behavior"
-          }
-        ]
-      },
-      {
-        "name": "shared_robot_model",
-        "components": [
-          {
-            "name": "DifferentialBaseModel",
-            "type": "isaac::planner::DifferentialBaseModel"
-          },
-          {
-            "name": "SphericalRobotShapeComponent",
-            "type": "isaac::planner::SphericalRobotShapeComponent"
-          }
-        ]
-      },
-      {
-        "name": "voice_control_component",
+        "name": "voice_control_components",
         "components": [
           {
             "name": "message_ledger",
@@ -144,47 +95,44 @@
         "name": "2d_ev3",
         "subgraph": "apps/ev3/2d_ev3.subgraph.json"
       },
+
+      {
+        "name": "navigation",
+        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_navigation.subgraph.json"
+      },
       {
         "name": "commander",
         "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_commander.subgraph.json"
-      },
-      {
-        "name": "odometry",
-        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_imu_odometry.subgraph.json"
-      },
-      {
-        "name": "local_map",
-        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/local_map.subgraph.json"
-      },
-      {
-        "name": "go_to",
-        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/go_to.subgraph.json"
       }
     ],
     "edges": [
       {
-        "source": "voice_detection.subgraph/interface/voice_command_id",
-        "target": "voice_control_component/goal_generator/voice_command_id"
+        "source": "voice_detection.subgraph/interface/detected_command",
+        "target": "voice_control_components/goal_generator/detected_command"
+      },
+      {
+        "source": "voice_control_components/goal_generator/goal",
+        "target": "navigation.subgraph/interface/goal"
+      },
+      {
+        "source": "2d_ev3.subgraph/interface/base_state",
+        "target": "navigation.subgraph/interface/state"
+      },
+      {
+        "source": "navigation.subgraph/interface/command",
+        "target": "commander.subgraph/interface/control"
       },
       {
         "source": "commander.subgraph/interface/command",
         "target": "2d_ev3.subgraph/interface/base_command"
       },
       {
-        "source": "2d_ev3.subgraph/interface/base_state",
-        "target": "odometry.subgraph/interface/state"
+        "source": "2d_ev3.subgraph/interface/flatscan",
+        "target": "navigation.subgraph/interface/flatscan_for_localization"
       },
       {
         "source": "2d_ev3.subgraph/interface/flatscan",
-        "target": "local_map.subgraph/interface/flatscan"
-      },
-      {
-        "source": "odometry.subgraph/interface/odometry",
-        "target": "go_to.subgraph/interface/odometry"
-      },
-      {
-        "source": "voice_control_component/goal_generator/goal",
-        "target": "go_to.subgraph/interface/goal"
+        "target": "navigation.subgraph/interface/flatscan_for_obstacles"
       }
     ]
   }

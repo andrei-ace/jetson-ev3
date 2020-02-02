@@ -1,0 +1,19 @@
+{
+  "map": {
+    "occupancy": {
+      "cell_size": 0.1,
+      "filename": "apps/ev3/voice_control/maps/map.png"
+    },
+    "waypoints": {
+      "vis_cell_size": 0.1,
+      "waypoints": {},
+      "tick_period": "1.0"
+    },
+    "restricted_area": {
+      "execution_group": "",
+      "priority": 0,
+      "slack": 0.0,
+      "tick_period": "1.0"
+    }
+  }
+}

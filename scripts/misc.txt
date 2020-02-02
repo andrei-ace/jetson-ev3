@@ -35,3 +35,6 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 http://www.cs.columbia.edu/~allen/F15/NOTES/icckinematics.pdf
 
 
+ bazel run apps/ev3/voice_control -- --graph apps/ev3/voice_control/maps/map.graph.json --config apps/ev3/voice_control/maps/map.config.json
+
+

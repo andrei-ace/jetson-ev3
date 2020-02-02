@@ -67,8 +67,8 @@
         "target": "voice_command_detector/isaac.audio.VoiceCommandConstruction/keyword_probabilities"
       },
       {
-        "source": "voice_command_detector/isaac.audio.VoiceCommandConstruction/voice_command_id",
-        "target": "subgraph/interface/voice_command_id"
+        "source": "voice_command_detector/isaac.audio.VoiceCommandConstruction/detected_command",
+        "target": "subgraph/interface/detected_command"
       }
     ]
   },

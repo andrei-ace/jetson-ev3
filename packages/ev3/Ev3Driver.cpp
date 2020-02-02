@@ -6,6 +6,9 @@
 
 namespace isaac
 {
+
+::kj::Promise<void> sendCommand(double linearSpeed, double angularSpeed, Ev3Control::Client *ev3Control);
+
 void Ev3Driver::start()
 {
     failsafe_ = node()->getComponent<alice::Failsafe>();
@@ -27,7 +30,7 @@ void Ev3Driver::tick()
             LOG_INFO("CMD available ls=%F as=%F", command.linear_speed(), command.angular_speed());
         }
 
-        auto safeCmdPromise = Ev3Driver::sendCommand(command.linear_speed(), command.angular_speed(), &ev3Control);
+        auto safeCmdPromise = sendCommand(command.linear_speed(), command.angular_speed(), &ev3Control);
 
         safeCmdPromise.wait(waitScope);
     }
@@ -45,40 +48,40 @@ void Ev3Driver::tick()
 
                 ToProto(ev3_state, tx_ev3_state().initProto(), tx_ev3_state().buffers());
                 tx_ev3_state().publish();
-                return;
-            }, 
-            [](kj::Exception &&exception) {
-                LOG_ERROR("state %s",exception.getDescription());
-                return; 
-            });
+                return; },[](kj::Exception &&exception) {
+                                                      LOG_ERROR("state %s", exception.getDescription());
+                                                      return;
+                                                  });
 
-        safeStatePromise.wait(waitScope);        
+        safeStatePromise.wait(waitScope);
     }
 
     // stop robot if the failsafe is triggered
-    if (!failsafe_->isAlive()) {
-      auto safeCmdPromise = Ev3Driver::sendCommand(0, 0, &ev3Control);
-      safeCmdPromise.wait(waitScope);
+    if (!failsafe_->isAlive())
+    {
+        auto safeCmdPromise = sendCommand(0, 0, &ev3Control);
+        safeCmdPromise.wait(waitScope);
     }
 }
 
-::kj::Promise<void> Ev3Driver::sendCommand(double linearSpeed, double angularSpeed, Ev3Control::Client *ev3Control){
-        ::capnp::MallocMessageBuilder message;
+::kj::Promise<void> sendCommand(double linearSpeed, double angularSpeed, Ev3Control::Client *ev3Control)
+{
+    ::capnp::MallocMessageBuilder message;
 
-        auto request = ev3Control->commandRequest();
-        Control::Builder cmd = message.initRoot<Control>();
-        cmd.setLinearSpeed(linearSpeed);
-        cmd.setAngularSpeed(angularSpeed);
-        request.setCmd(cmd);
+    auto request = ev3Control->commandRequest();
+    Control::Builder cmd = message.initRoot<Control>();
+    cmd.setLinearSpeed(linearSpeed);
+    cmd.setAngularSpeed(angularSpeed);
+    request.setCmd(cmd);
 
-        auto cmdPromise = request.send().ignoreResult();
+    auto cmdPromise = request.send().ignoreResult();
 
-        auto safeCmdPromise = cmdPromise.catch_([](kj::Exception &&exception) {
-            LOG_ERROR("command %s", exception.getDescription());
-            return;
-        });
+    auto safeCmdPromise = cmdPromise.catch_([](kj::Exception &&exception) {
+        LOG_ERROR("command %s", exception.getDescription());
+        return;
+    });
 
-        return safeCmdPromise;
+    return safeCmdPromise;
 }
 
 void Ev3Driver::stop()
@@ -86,7 +89,7 @@ void Ev3Driver::stop()
     capnp::EzRpcClient client(get_address(), get_port());
     Ev3Control::Client ev3Control = client.getMain<Ev3Control>();
     auto &waitScope = client.getWaitScope();
-    auto safeCmdPromise = Ev3Driver::sendCommand(0, 0, &ev3Control);
+    auto safeCmdPromise = sendCommand(0, 0, &ev3Control);
     safeCmdPromise.wait(waitScope);
 }
 } // namespace isaac
