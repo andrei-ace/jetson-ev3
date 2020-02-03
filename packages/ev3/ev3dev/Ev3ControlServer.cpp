@@ -8,8 +8,8 @@
 #include <math.h>
 
 const int MAX_SPEED = 900;
-const float TACHO_TO_SPEED = 0.000255;
-const float BASE_LENGHT = 0.38;
+const float TACHO_TO_SPEED = 0.00026;
+const float BASE_LENGHT = 0.18;
 ev3dev::large_motor l_motor(ev3dev::OUTPUT_B);
 ev3dev::large_motor r_motor(ev3dev::OUTPUT_C);
 
@@ -50,19 +50,21 @@ public:
 
         Dynamics::Builder state = message.initRoot<Dynamics>();
 
-        auto start = std::chrono::high_resolution_clock::now();
-        int l_position_start = l_motor.position();
-        int r_position_start = r_motor.position();
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        auto  end = std::chrono::high_resolution_clock::now();
         int l_position_end = l_motor.position();
         int r_position_end = r_motor.position();
-        auto end = std::chrono::high_resolution_clock::now();
+        
         std::chrono::duration<float, std::milli> elapsed = end-start;
-
+        
         float l_speed = (l_position_end - l_position_start)/elapsed.count() * 1000;
         float r_speed = (r_position_end - r_position_start)/elapsed.count() * 1000;
 
-        state.setLinearSpeed(tacho_to_si(l_speed+r_speed)/2);
+        //restart count
+        start = std::chrono::high_resolution_clock::now();
+        l_position_start = l_motor.position();
+        r_position_start = r_motor.position();
+
+        state.setLinearSpeed(tacho_to_si(r_speed - (r_speed-l_speed)/2));
 
         state.setAngularSpeed(tacho_to_si(r_speed-l_speed)/BASE_LENGHT);
         
@@ -76,6 +78,10 @@ public:
 
         return kj::READY_NOW;
     }
+    private:
+        std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
+        int l_position_start = l_motor.position();
+        int r_position_start = r_motor.position();
 };
 
 //---------------------------------------------------------------------------

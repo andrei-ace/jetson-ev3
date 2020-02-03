@@ -1,56 +1,45 @@
 {
   "name": "ev3",
-  "graph": {
-    "nodes": [
-      {
-        "name": "2d_ev3",
-        "subgraph": "apps/ev3/2d_ev3.subgraph.json"
-      },
-      {
-        "name": "navigation",
-        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_navigation.subgraph.json"
-      },
-      {
-        "name": "goals",
-        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/goal_generators.subgraph.json"
-      },
-      {
-        "name": "commander",
-        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_commander.subgraph.json"
-      }
-    ],
-    "edges": [
-      {
-        "source": "commander.subgraph/interface/command",
-        "target": "2d_ev3.subgraph/interface/base_command"
-      },
-      {
-        "source": "goals.subgraph/interface/goal",
-        "target": "navigation.subgraph/interface/goal"
-      },
-      {
-        "source": "navigation.subgraph/interface/feedback",
-        "target": "goals.subgraph/interface/feedback"
-      },
-      {
-        "source": "2d_ev3.subgraph/interface/flatscan",
-        "target": "navigation.subgraph/interface/flatscan_for_localization"
-      },
-      {
-        "source": "2d_ev3.subgraph/interface/flatscan",
-        "target": "navigation.subgraph/interface/flatscan_for_obstacles"
-      },
-      {
-        "source": "2d_ev3.subgraph/interface/base_state",
-        "target": "navigation.subgraph/interface/state"
-      },
-      {
-        "source": "navigation.subgraph/interface/command",
-        "target": "commander.subgraph/interface/control"
-      }
-    ]
-  },
+  "modules": [
+    "@com_nvidia_isaac//packages/navigation",
+    "@com_nvidia_isaac//packages/planner"
+  ],
   "config": {
+    "2d_ev3.ev3_hardware.ev3": {
+      "isaac.Ev3Driver": {
+        "address": "ev3dev.local",
+        "port": 9000
+      }
+    },
+    "navigation.imu_odometry.odometry": {
+      "DifferentialBaseWheelImuOdometry": {
+        "use_imu": false
+      }
+    },
+    "commander.robot_remote": {
+      "isaac.navigation.RobotRemoteControl": {
+        "angular_speed_max": 0.3,
+        "linear_speed_max": 0.2
+      }
+    },
+    "websight": {
+      "WebsightServer": {
+        "webroot": "external/com_nvidia_isaac/packages/sight/webroot",
+      }
+    },
+    "navigation.shared_robot_model": {
+      "SphericalRobotShapeComponent": {
+        "circles": [
+          { "center": [0.0, 0.0], "radius": 0.075 },
+          { "center": [0.02, 0.03464], "radius": 0.055 },
+          { "center": [0.02, -0.03464], "radius": 0.055 },
+          { "center": [-0.04, 0.0], "radius": 0.055 },
+          { "center": [0.0525, 0.09093], "radius": 0.035 },
+          { "center": [0.0525, -0.09093], "radius": 0.035 },
+          { "center": [-0.105, 0.0], "radius": 0.035 }
+        ]
+      }
+    },
     "navigation.control.lqr": {
       "isaac.planner.DifferentialBaseLqrPlanner": {
         "manual_mode_channel": "commander.robot_remote/isaac.navigation.RobotRemoteControl/manual_mode"
@@ -61,6 +50,44 @@
         "manual_mode_channel": "commander.robot_remote/isaac.navigation.RobotRemoteControl/manual_mode"
       }
     }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "name": "2d_ev3",
+        "subgraph": "apps/ev3/2d_ev3.subgraph.json"
+      },
+
+      {
+        "name": "navigation",
+        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_navigation.subgraph.json"
+      },
+      {
+        "name": "commander",
+        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_commander.subgraph.json"
+      }
+    ],
+    "edges": [
+      {
+        "source": "2d_ev3.subgraph/interface/base_state",
+        "target": "navigation.subgraph/interface/state"
+      },
+      {
+        "source": "navigation.subgraph/interface/command",
+        "target": "commander.subgraph/interface/control"
+      },
+      {
+        "source": "commander.subgraph/interface/command",
+        "target": "2d_ev3.subgraph/interface/base_command"
+      },
+      {
+        "source": "2d_ev3.subgraph/interface/flatscan",
+        "target": "navigation.subgraph/interface/flatscan_for_localization"
+      },
+      {
+        "source": "2d_ev3.subgraph/interface/flatscan",
+        "target": "navigation.subgraph/interface/flatscan_for_obstacles"
+      }
+    ]
   }
 }
-

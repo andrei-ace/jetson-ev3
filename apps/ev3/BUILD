@@ -26,14 +26,14 @@ isaac_subgraph(
 isaac_app(
     name = "ev3",
     data = [
-        ":2d_ev3_subgraph"
+        ":2d_ev3_subgraph",
+        "//apps/assets/maps",
+        "@com_nvidia_isaac//packages/navigation/apps:differential_base_commander_subgraph",
+        "@com_nvidia_isaac//packages/navigation/apps:differential_base_navigation_subgraph",
     ],
     modules = [
         "@com_nvidia_isaac//packages/navigation",
-        "@com_nvidia_isaac//packages/perception",
-        "@com_nvidia_isaac//packages/planner",
-        "@com_nvidia_isaac//packages/sensors:joystick",
-        "@com_nvidia_isaac//packages/ydlidar",
+        "@com_nvidia_isaac//packages/planner"
     ],
 )
 
