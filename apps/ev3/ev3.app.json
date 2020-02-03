@@ -24,7 +24,7 @@
     },
     "websight": {
       "WebsightServer": {
-        "webroot": "external/com_nvidia_isaac/packages/sight/webroot",
+        "webroot": "external/com_nvidia_isaac/packages/sight/webroot"
       }
     },
     "navigation.shared_robot_model": {
