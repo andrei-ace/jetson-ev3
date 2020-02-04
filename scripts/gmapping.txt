@@ -1,0 +1,3 @@
+andrei@andrei-linux:~/ml/jetson-ev3$ ./engine/build/deploy.sh --remote_user andrei -p //apps/ev3/gmapping:gmapping-pkg -d jetpack43 -h 192.168.0.173
+robot@ev3dev:~$ brickrun ./ev3_control_server ev3dev.local:9000
+andrei@andrei-jetson:~/deploy/andrei/gmapping-pkg$ ./apps/ev3/gmapping/gmapping

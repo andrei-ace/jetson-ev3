@@ -1,7 +1,8 @@
 {
   "modules": [
     "ev3",
-    "@com_nvidia_isaac//packages/ydlidar"
+    "@com_nvidia_isaac//packages/ydlidar",
+    "lidar_angle_changer"
   ],
   "config": {
     "ev3": {
@@ -62,6 +63,19 @@
             "type": "isaac::ydlidar::YdLidar"
           }
         ]
+      },
+      {
+        "name": "lidar_angle_changer",
+        "components": [
+          {
+            "name": "message_ledger",
+            "type": "isaac::alice::MessageLedger"
+          },
+          {
+            "name": "isaac.ev3.LidarAngleChanger",
+            "type": "isaac::ev3::LidarAngleChanger"
+          }
+        ]
       }
     ],
     "edges": [
@@ -75,6 +89,10 @@
       },
       {
         "source": "ydlidar/YdLidar/flatscan",
+        "target": "lidar_angle_changer/isaac.ev3.LidarAngleChanger/scan"
+      },
+      {
+        "source": "lidar_angle_changer/isaac.ev3.LidarAngleChanger/flatscan",
         "target": "subgraph/interface/scan"
       }
     ]
