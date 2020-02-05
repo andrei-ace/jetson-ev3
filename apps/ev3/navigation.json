@@ -65,21 +65,9 @@
       {
         "name": "commander",
         "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_commander.subgraph.json"
-      },
-      {
-        "name": "goals",
-        "subgraph": "@com_nvidia_isaac//packages/navigation/apps/goal_generators.subgraph.json"
       }
     ],
     "edges": [
-      {
-        "source": "goals.subgraph/interface/goal",
-        "target": "navigation.subgraph/interface/goal"
-      },
-      {
-        "source": "navigation.subgraph/interface/feedback",
-        "target": "goals.subgraph/interface/feedback"
-      },
       {
         "source": "2d_ev3.subgraph/interface/base_state",
         "target": "navigation.subgraph/interface/state"

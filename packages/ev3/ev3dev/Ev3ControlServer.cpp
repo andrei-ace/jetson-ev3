@@ -9,7 +9,7 @@
 
 const int MAX_SPEED = 900;
 const float TACHO_TO_SPEED = 0.00026;
-const float BASE_LENGHT = 0.18;
+const float BASE_LENGHT = 0.18567;
 ev3dev::large_motor l_motor(ev3dev::OUTPUT_B);
 ev3dev::large_motor r_motor(ev3dev::OUTPUT_C);
 

@@ -89,18 +89,18 @@
     "gmapping": {
       "gmapping": {
         "file_path": "/tmp",
-        "build_map_period": 1.0,
-        "laser_matcher_resolution": 0.2,
-        "map_x_max": 5.0,
-        "map_x_min": -5.0,
-        "map_y_max": 5.0,
-        "map_y_min": -5.0,
+        "build_map_period": 30.0,
+        "laser_matcher_resolution": 0.3,
+        "map_x_max": 4.0,
+        "map_x_min": -4.0,
+        "map_y_max": 4.0,
+        "map_y_min": -4.0,
         "map_resolution": 0.01,
-        "max_range": 3,
-        "map_update_range": 1.0,
-        "number_particles": 10,
-        "linear_distance": 0.1,
-        "angular_distance": 0.1,
+        "max_range": 4,
+        "map_update_range": 2.0,
+        "number_particles": 256,
+        "linear_distance": 0.01,
+        "angular_distance": 3.1415,
         "use_pose_tree": false
       }
     },
@@ -112,7 +112,7 @@
     "commander.robot_remote": {
       "isaac.navigation.RobotRemoteControl": {
         "angular_speed_max": 0.1,
-        "linear_speed_max": 0.1
+        "linear_speed_max": 0.05
       }
     },
     "websight": {

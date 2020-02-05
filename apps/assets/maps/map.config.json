@@ -1,19 +1,114 @@
 {
   "map": {
-    "occupancy": {
-      "cell_size": 0.1,
-      "filename": "apps/assets/maps/map.png"
+    "isaac.map.Map": {
+      "config_file_name": "",
+      "execution_queue_limit": 1,
+      "graph_file_name": ""
     },
-    "waypoints": {
-      "vis_cell_size": 0.1,
-      "waypoints": {},
-      "tick_period": "1.0"
+    "map": {
+      "global_localization_area_prefix": "localization_area",
+      "occupancy_grid_prefix": "occupancy",
+      "restricted_area_prefix": "restricted_area",
+      "waypoint_prefix": "waypoints"
+    },
+    "occupancy": {
+      "cell_size": 0.01,
+      "filename": "apps/assets/maps/map.png",
+      "threshold": 0.4
     },
     "restricted_area": {
+      "color": [
+        255,
+        0,
+        0
+      ],
       "execution_group": "",
-      "priority": 0,
-      "slack": 0.0,
-      "tick_period": "1.0"
+      "frame": "world",
+      "obstacle_max_distance": 1.5,
+      "obstacle_pixel_size": 0.1,
+      "polygons": {
+        "poly00034087629421830634": {
+          "points": [
+            [
+              1.71,
+              1.6600000000000001
+            ],
+            [
+              5.9,
+              2.13
+            ],
+            [
+              5.55,
+              0.75
+            ],
+            [
+              1.61,
+              1.23
+            ],
+            [
+              1.51,
+              1.43
+            ]
+          ]
+        },
+        "poly528487892589034": {
+          "points": [
+            [
+              7.0200000000000005,
+              5.2
+            ],
+            [
+              6.54,
+              3.33
+            ],
+            [
+              5.9,
+              2.14
+            ],
+            [
+              7.640000000000001,
+              1.53
+            ],
+            [
+              8.69,
+              4.71
+            ],
+            [
+              8.19,
+              4.88
+            ]
+          ]
+        },
+        "poly9886474798195617": {
+          "points": [
+            [
+              6.5200000000000005,
+              6.93
+            ],
+            [
+              6.99,
+              5.21
+            ],
+            [
+              8.28,
+              5.26
+            ],
+            [
+              7.58,
+              7.03
+            ],
+            [
+              6.83,
+              6.95
+            ]
+          ]
+        }
+      }
+    },
+    "waypoints": {
+      "tick_period": "1.0",
+      "vis_cell_size": 0.1,
+      "waypoints": null
     }
   }
 }

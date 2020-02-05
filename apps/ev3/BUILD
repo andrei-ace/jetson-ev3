@@ -31,6 +31,21 @@ isaac_app(
         "//apps/assets/maps",
         "@com_nvidia_isaac//packages/navigation/apps:differential_base_commander_subgraph",
         "@com_nvidia_isaac//packages/navigation/apps:differential_base_navigation_subgraph",
+        "@com_nvidia_isaac//packages/navigation/apps:goal_generators_subgraph",
+    ],
+    modules = [
+        "@com_nvidia_isaac//packages/navigation",
+        "@com_nvidia_isaac//packages/planner",
+    ],
+)
+
+isaac_app(
+    name = "navigation",
+    data = [
+        ":2d_ev3_subgraph",
+        "//apps/assets/maps",
+        "@com_nvidia_isaac//packages/navigation/apps:differential_base_commander_subgraph",
+        "@com_nvidia_isaac//packages/navigation/apps:differential_base_navigation_subgraph",
     ],
     modules = [
         "@com_nvidia_isaac//packages/navigation",

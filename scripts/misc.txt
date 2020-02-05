@@ -38,3 +38,7 @@ http://www.cs.columbia.edu/~allen/F15/NOTES/icckinematics.pdf
  bazel run apps/ev3/voice_control -- --graph apps/ev3/voice_control/maps/map.graph.json --config apps/ev3/voice_control/maps/map.config.json
 
 
+
+andrei@andrei-linux:~/ml/isaac$ cp ../jetson-ev3/apps/assets/maps/* ./apps/assets/maps/*
+andrei@andrei-linux:~/ml/isaac$ touch apps/assets/maps/map_backup.config.json
+andrei@andrei-linux:~/ml/isaac$ bazel run apps/map_editor -- --config apps/assets/maps/map.config.json --graph apps/assets/maps/map.graph.json --config_backup apps/assets/maps/map.graph.json.bak
