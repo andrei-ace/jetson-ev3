@@ -7,17 +7,17 @@
     "gmapping": {
       "gmapping": {
         "map_resolution": 0.005,
-        "map_x_max": 1,
-        "map_x_min": 1,
-        "map_y_max": 1,
-        "map_y_min": 1,
+        "map_x_max": 5,
+        "map_x_min": -5,
+        "map_y_max": 5,
+        "map_y_min": -5,
         "use_pose_tree": false,
-        "linear_distance": 0.2,
-        "angular_distance": 0.08,
+        "linear_distance": 0.01,
+        "angular_distance": 0.01,
         "max_range": 1.69,
         "map_update_range": 1.68,
-        "number_particles": 50,
-        "laser_matcher_resolution": 0.008
+        "number_particles": 100,
+        "laser_matcher_resolution": 0.01
       }
     },
     "tcp_subscriber": {

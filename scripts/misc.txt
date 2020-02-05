@@ -42,3 +42,10 @@ http://www.cs.columbia.edu/~allen/F15/NOTES/icckinematics.pdf
 andrei@andrei-linux:~/ml/isaac$ cp ../jetson-ev3/apps/assets/maps/* ./apps/assets/maps/*
 andrei@andrei-linux:~/ml/isaac$ touch apps/assets/maps/map_backup.config.json
 andrei@andrei-linux:~/ml/isaac$ bazel run apps/map_editor -- --config apps/assets/maps/map.config.json --graph apps/assets/maps/map.graph.json --config_backup apps/assets/maps/map.graph.json.bak
+
+
+
+----------------
+
+andrei@andrei-linux:~/ml/jetson-ev3$ ./engine/build/deploy.sh --remote_user andrei -p //apps/ev3:ev3-pkg -d jetpack43 -h 192.168.0.218
+andrei@andrei-jetson:~/deploy/andrei/ev3-pkg$ ./apps/ev3/ev3 --graph ./apps/assets/maps/map.graph.json --config ./apps/assets/maps/map.config.json

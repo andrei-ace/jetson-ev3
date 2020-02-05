@@ -94,8 +94,8 @@
     },
     "commander.robot_remote": {
       "isaac.navigation.RobotRemoteControl": {
-        "angular_speed_max": 0.10,
-        "linear_speed_max": 0.10
+        "angular_speed_max": 0.1,
+        "linear_speed_max": 0.05
       }
     },
     "odometry.odometry": {

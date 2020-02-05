@@ -28,20 +28,24 @@
       }
     },
     "navigation.shared_robot_model": {
+      "DifferentialBaseModel": {
+        "robot_radius": 0.140,
+        "base_length": 0.156,
+        "wheel_radius": 0.02
+      },
       "SphericalRobotShapeComponent": {
         "circles": [
-          { "center": [0.0, 0.0], "radius": 0.075 },
-          { "center": [0.02, 0.03464], "radius": 0.055 },
-          { "center": [0.02, -0.03464], "radius": 0.055 },
-          { "center": [-0.04, 0.0], "radius": 0.055 },
-          { "center": [0.0525, 0.09093], "radius": 0.035 },
-          { "center": [0.0525, -0.09093], "radius": 0.035 },
-          { "center": [-0.105, 0.0], "radius": 0.035 }
+          { "center": [0.0, 0.0], "radius": 0.12 }
         ]
       }
     },
     "navigation.control.lqr": {
       "isaac.planner.DifferentialBaseLqrPlanner": {
+        "max_speed": 0.08,
+        "max_angular_speed": 0.4,
+        "num_controls": 50,
+        "obstacle_names": ["local_map", "map/restricted_area"],
+        "tick_period": "10Hz",
         "manual_mode_channel": "commander.robot_remote/isaac.navigation.RobotRemoteControl/manual_mode"
       }
     },
@@ -49,6 +53,26 @@
       "isaac.planner.DifferentialBaseControl": {
         "manual_mode_channel": "commander.robot_remote/isaac.navigation.RobotRemoteControl/manual_mode"
       }
+    },
+    "goals.goal_behavior": {
+      "isaac.navigation.SelectorBehavior":{
+        "desired_behavior": "pose"
+      }
+    },
+    "navigation.localization.robot_pose_initializer": {
+      "initial_pose": {
+        "attach_interactive_marker": true,
+        "lhs_frame": "world",
+        "pose": {
+          "translation": [0.0, 0.0, 0.0]
+        },
+        "rhs_frame": "robot_init"
+      }
+    },
+    "navigation.go_to.goal_monitor": {
+        "GoalMonitor": {
+          "arrived_position_thresholds": [0.1,0.2617993877991494]
+        }
     }
   },
   "graph": {
