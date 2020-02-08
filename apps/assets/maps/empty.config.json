@@ -1,0 +1,38 @@
+{
+  "map": {
+    "isaac.map.Map": {
+      "config_file_name": "",
+      "execution_queue_limit": 1,
+      "graph_file_name": ""
+    },
+    "map": {
+      "global_localization_area_prefix": "localization_area",
+      "occupancy_grid_prefix": "occupancy",
+      "restricted_area_prefix": "restricted_area",
+      "waypoint_prefix": "waypoints"
+    },
+    "occupancy": {
+      "cell_size": 0.007,
+      "filename": "apps/assets/maps/empty.png",
+      "threshold": 0.4
+    },
+    "restricted_area": {
+      "color": [
+        255,
+        0,
+        0
+      ],
+      "execution_group": "",
+      "frame": "world",
+      "obstacle_max_distance": 0.5,
+      "obstacle_pixel_size": 0.007,
+      "polygons": {
+      }
+    },
+    "waypoints": {
+      "tick_period": "1.0",
+      "vis_cell_size": 0.01,
+      "waypoints": null
+    }
+  }
+}

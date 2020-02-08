@@ -8,14 +8,11 @@ local_repository(
 load("@com_nvidia_isaac//engine/build:isaac.bzl", "isaac_git_repository", "isaac_new_http_archive")
 load("@com_nvidia_isaac//third_party:engine.bzl", "isaac_engine_workspace")
 load("@com_nvidia_isaac//third_party:packages.bzl", "isaac_packages_workspace")
-load("@com_nvidia_isaac//third_party:ros.bzl", "isaac_ros_workspace")
 load("@com_nvidia_isaac//third_party:zed.bzl", "isaac_zed_workspace")
 
 isaac_engine_workspace()
 
 isaac_packages_workspace()
-
-isaac_ros_workspace()
 
 isaac_zed_workspace()
 
@@ -171,6 +168,41 @@ cc_library(
     ],
 )
 """,
+)
+
+new_git_repository(
+    name = "libpixyusb2_git",
+    remote = "https://github.com/charmedlabs/pixy2.git",
+    commit = "1cfbda14259cf740433ccf52dd04e6e67868e0c7",
+    build_file_content = """
+cc_library(
+    name = "libpixyusb2",
+    srcs = glob([
+        "src/host/libpixyusb2/src/*.cpp",
+        "src/common/src/chirp.cpp",
+        ]),
+    hdrs = glob([
+        "src/host/libpixyusb2/include/*",
+        "src/common/inc/*",
+        "src/host/arduino/libraries/Pixy2/*",
+        ]),
+    visibility = ["//visibility:public"],
+    includes = [
+        ".",
+        "src/host/libpixyusb2/include",
+        "src/common/inc",
+        "src/host/arduino/libraries/Pixy2",
+    ],
+    copts = [
+        "-Wno-int-to-pointer-cast",
+        "-Wno-maybe-uninitialized",
+        "-Wno-misleading-indentation",
+        "-g -D__LINUX__"
+    ],
+    deps = [
+        "@libusb//:libusb"
+    ]
+)""",
 )
 
 ####################################################################################################

@@ -1,0 +1,33 @@
+{
+    "name": "pixy_vision",
+    "modules": [
+      "//apps/ev3/battle_tank:pixy_vision_components"
+    ],
+    "graph": {
+      "nodes": [
+        {
+          "name": "pixy",
+          "components": [
+            {
+              "name": "message_ledger",
+              "type": "isaac::alice::MessageLedger"
+            },
+            {
+              "name": "pixy",
+              "type": "isaac::ev3::PixyVision"
+            }
+          ]
+        }
+      ],
+      "edges": [
+      ]
+    },
+    "config": {
+      "pixy" : {
+        "pixy" : {
+          "tick_period" : "25Hz"
+        }
+      }
+    }
+  }
+  

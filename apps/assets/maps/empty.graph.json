@@ -1,0 +1,31 @@
+{
+  "nodes": [
+    {
+      "name": "map",
+      "start_order": -100,
+      "components": [
+        {
+          "name": "isaac.map.Map",
+          "type": "isaac::map::Map"
+        },
+        {
+          "name": "map",
+          "type": "isaac::navigation::NavigationMap"
+        },
+        {
+          "name": "occupancy",
+          "type": "isaac::map::OccupancyGridMapLayer"
+        },
+        {
+          "name": "waypoints",
+          "type": "isaac::map::WaypointMapLayer"
+        },
+        {
+          "name": "restricted_area",
+          "type": "isaac::map::PolygonMapLayer"
+        }
+      ]
+    }
+  ],
+  "edges": []
+}

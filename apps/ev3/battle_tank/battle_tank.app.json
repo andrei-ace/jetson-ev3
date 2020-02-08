@@ -1,0 +1,204 @@
+{
+    "name": "ev3",
+    "modules": [
+      "//apps/ev3/battle_tank:battle_tank_components",
+      "@com_nvidia_isaac//packages/navigation",
+      "@com_nvidia_isaac//packages/planner"
+    ],
+    "config": {
+      "2d_ev3.ev3_hardware.ev3": {
+        "isaac.Ev3Driver": {
+          "address": "ev3dev.local",
+          "port": 9000
+        }
+      },
+      "navigation.imu_odometry.odometry": {
+        "DifferentialBaseWheelImuOdometry": {
+          "use_imu": false
+        }
+      },
+      "commander.robot_remote": {
+        "isaac.navigation.RobotRemoteControl": {
+          "angular_speed_max": 0.4,
+          "linear_speed_max": 0.08
+        }
+      },
+      "websight": {
+        "WebsightServer": {
+          "webroot": "external/com_nvidia_isaac/packages/sight/webroot"
+        }
+      },
+      "navigation.shared_robot_model": {
+        "DifferentialBaseModel": {
+          "robot_radius": 0.10,
+          "base_length": 0.156,
+          "wheel_radius": 0.02
+        },
+        "SphericalRobotShapeComponent": {
+          "circles": [
+            { "center": [0.0, 0.0], "radius": 0.10 }
+          ]
+        }
+      },
+      "navigation.control.lqr": {
+        "isaac.planner.DifferentialBaseLqrPlanner": {
+          "max_speed": 0.1,
+          "min_speed": 0.0,
+          "max_angular_speed": 0.6,
+          "target_distance": 0.05,
+          "min_distance": 0.05,
+          "manual_mode_channel": "commander.robot_remote/isaac.navigation.RobotRemoteControl/manual_mode"
+        }
+      },
+      "navigation.control.control": {
+        "isaac.planner.DifferentialBaseControl": {
+          "manual_mode_channel": "commander.robot_remote/isaac.navigation.RobotRemoteControl/manual_mode"
+        }
+      },
+      "goals.goal_behavior": {
+        "isaac.navigation.SelectorBehavior":{
+          "desired_behavior": "pose"
+        }
+      },
+      "navigation.localization.robot_pose_initializer": {
+        "initial_pose": {
+          "attach_interactive_marker": true,
+          "lhs_frame": "world",
+          "pose": {
+            "translation": [0.0, 0.0, 0.0]
+          },
+          "rhs_frame": "robot_init"
+        }
+      },
+      "navigation.localization.scan_localization":{
+          "isaac.navigation.ParticleFilterLocalization": {
+        }
+      },
+      "navigation.localization.global_localization": {
+        "grid_search_localizer":{
+          "robot_radius": 0.10,
+          "sample_distance": 0.1
+        }
+      },
+      "navigation.go_to.goal_monitor": {
+          "GoalMonitor": {
+            "arrived_position_thresholds": [0.1,0.2617993877991494]
+          }
+      },
+      "navigation.planner.global_plan_smoother":{
+        "smoother": {
+          "optimized_length": 5,
+          "target_clearance": 0.1
+        }
+      },
+      "navigation.planner.global_plan":{
+        "isaac.planner.GlobalPlanner": {
+          "max_colliding_lookup": 0.1,
+          "model_max_translation_distance": 0.1
+        }
+      },
+      "pose_as_goal": {
+        "isaac.navigation.PoseAsGoal": {
+          "goal_frame": "pose_as_goal",
+          "tick_period": "250ms"
+        },
+        "pose_as_goal_frame": {
+          "lhs_frame": "world",
+          "rhs_frame": "pose_as_goal",
+          "pose": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+          "attach_interactive_marker": true
+        }
+      },
+      "battle_tank_components":{
+        "battle_tank":{
+          "navigation_mode": "navigation.control.navigation_mode/isaac.navigation.GroupSelectorBehavior",
+          "center_threshold": 0.3,
+          "area_threshold": 0.1,
+          "tick_period": "10Hz"
+        }
+      }
+    },
+    "graph": {
+      "nodes": [
+        {
+          "name": "battle_tank_components",
+          "start_order": 200,
+          "components": [
+            {
+              "name": "message_ledger",
+              "type": "isaac::alice::MessageLedger"
+            },
+            {
+              "name": "battle_tank",
+              "type": "isaac::ev3::BattleTank"
+            }
+          ]
+        },
+        {
+          "name": "2d_ev3",
+          "subgraph": "apps/ev3/2d_ev3.subgraph.json"
+        },
+  
+        {
+          "name": "navigation",
+          "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_navigation.subgraph.json"
+        },
+        {
+          "name": "commander",
+          "subgraph": "@com_nvidia_isaac//packages/navigation/apps/differential_base_commander.subgraph.json"
+        },
+        {
+          "name": "pose_as_goal",
+          "components": [
+            {
+              "name": "message_ledger",
+              "type": "isaac::alice::MessageLedger"
+            },
+            {
+              "name": "isaac.navigation.PoseAsGoal",
+              "type": "isaac::navigation::PoseAsGoal"
+            },
+            {
+              "name": "pose_as_goal_frame",
+              "type": "isaac::alice::PoseInitializer"
+            }
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "source": "pose_as_goal/isaac.navigation.PoseAsGoal/goal",
+          "target": "battle_tank_components/battle_tank/original_goal"
+        },
+        {
+          "source": "battle_tank_components/battle_tank/goal",
+          "target": "navigation.subgraph/interface/goal"
+        },
+        {
+          "source": "navigation.subgraph/interface/feedback",
+          "target": "battle_tank_components/battle_tank/feedback"
+        },
+        {
+          "source": "2d_ev3.subgraph/interface/base_state",
+          "target": "navigation.subgraph/interface/state"
+        },
+        {
+          "source": "navigation.subgraph/interface/command",
+          "target": "commander.subgraph/interface/control"
+        },
+        {
+          "source": "commander.subgraph/interface/command",
+          "target": "2d_ev3.subgraph/interface/base_command"
+        },
+        {
+          "source": "2d_ev3.subgraph/interface/flatscan",
+          "target": "navigation.subgraph/interface/flatscan_for_localization"
+        },
+        {
+          "source": "2d_ev3.subgraph/interface/flatscan",
+          "target": "navigation.subgraph/interface/flatscan_for_obstacles"
+        }
+      ]
+    }
+  }
+  
