@@ -1,5 +1,0 @@
-robot@ev3dev:~$ ./ev3_control_server ev3dev.local:9000
-
-andrei@andrei-linux:~/ml/jetson-ev3$ /home/andrei/ml/isaac/engine/build/deploy.sh --remote_user andrei -p //apps/ev3:joystick-pkg -d jetpack43 -h 192.168.0.218
-
-andrei@andrei-jetson:~/deploy/andrei/joystick-pkg$ ./apps/ev3/joystick 

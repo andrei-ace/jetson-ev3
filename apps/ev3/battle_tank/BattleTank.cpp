@@ -21,100 +21,101 @@ constexpr char kStateShoot[] = "kStateShoot";
 
 void BattleTank::start()
 {
-    navigation_mode_ = node()->app()->findComponentByName<navigation::GroupSelectorBehavior>(
-        get_navigation_mode());
-    ASSERT(navigation_mode_, "Could not find navigation mode");
-    createStateMachine();
+  navigation_mode_ = node()->app()->findComponentByName<navigation::GroupSelectorBehavior>(
+      get_navigation_mode());
+  ASSERT(navigation_mode_, "Could not find navigation mode");
+  createStateMachine();
 
-    // Start in desired state
-    machine_.start(kStateInit);
+  // Start in desired state
+  machine_.start(kStateInit);
 
-    tickPeriodically();
+  tickPeriodically();
 
-    // we need to initalise it after call to tickPeriodically() to work
-    int result = pixy.init();
-    ASSERT(result >= 0, "Could not initialise Pixy2 Camera");
+  // we need to initalise it after call to tickPeriodically() to work
+  int result = pixy.init();
+  ASSERT(result >= 0, "Could not initialise Pixy2 Camera");
 }
 
 void BattleTank::tick()
 {
-    pixy.ccc.getBlocks(true, CCC_SIG1, 1);
-    machine_.tick();
+  pixy.ccc.getBlocks(true, CCC_SIG1, 1);
+  machine_.tick();
 }
 
 void BattleTank::stop()
 {
-    machine_.stop();
+  machine_.stop();
 }
 
 void BattleTank::createStateMachine()
 {
-    const std::vector<State> all_states = {
-        kStateNavigation,
-        kStateDetected,
-        kStateShoot};
+  const std::vector<State> all_states = {
+      kStateNavigation,
+      kStateDetected,
+      kStateShoot};
 
-    machine_.setToString([this](const State &state) { return state; });
+  machine_.setToString([this](const State &state) { return state; });
 
-    machine_.addState(kStateInit, [] {}, [] {}, [] {});
+  machine_.addState(kStateInit, [] {}, [] {}, [] {});
 
-    machine_.addTransition(kStateInit, kStateNavigation,
-                           [this] {
-                               bool ok;
-                               Pose2d pose = get_world_T_robot(getTickTime(), ok);
-                               if (ok)
-                               {
-                                   return true;
-                               }
-                               return false;
-                           },
-                           [this] {});
+  // move in kStateNavigation after world_T_robot is available
+  machine_.addTransition(kStateInit, kStateNavigation,
+                         [this] {
+                           bool ok;
+                           get_world_T_robot(getTickTime(), ok);
+                           if (ok)
+                           {
+                             return true;
+                           }
+                           return false;
+                         },
+                         [this] {});
 
-    machine_.addState(kStateNavigation,
-                      [this] {
-                          LOG_INFO("Entering %s", kStateNavigation);
-                      },
-                      [this] {
-                          if (rx_original_goal().available())
-                          {
-                              auto original_goal = rx_original_goal().getProto();
-                              auto goal = tx_goal().initProto();
-                              // publish back the original goal
-                              goal.setGoal(original_goal.getGoal());
-                              goal.setGoalFrame(original_goal.getGoalFrame());
-                              goal.setStopRobot(original_goal.getStopRobot());
-                              goal.setTolerance(original_goal.getTolerance());
-                              tx_goal().publish();
-                          }
-                      },
-                      [] {});
+  machine_.addState(kStateNavigation,
+                    [this] {
+                      LOG_INFO("Entering %s", kStateNavigation);
+                    },
+                    [this] {
+                      if (rx_original_goal().available())
+                      {
+                        auto original_goal = rx_original_goal().getProto();
+                        auto goal = tx_goal().initProto();
+                        // publish back the original goal
+                        goal.setGoal(original_goal.getGoal());
+                        goal.setGoalFrame(original_goal.getGoalFrame());
+                        goal.setStopRobot(original_goal.getStopRobot());
+                        goal.setTolerance(original_goal.getTolerance());
+                        tx_goal().publish();
+                      }
+                    },
+                    [] {});
 
-    machine_.addTransition(kStateNavigation, kStateDetected,
-                           [this] {
-                               if (pixy.ccc.numBlocks && !success)
-                               {
-                                   return true;
-                               }
-                               return false;
-                           },
-                           [this] {
-                           });
+  // move in kStateDetected if Pixy2 detected the target
+  machine_.addTransition(kStateNavigation, kStateDetected,
+                         [this] {
+                           if (pixy.ccc.numBlocks && !success)
+                           {
+                             return true;
+                           }
+                           return false;
+                         },
+                         [this] {
+                         });
 
-    machine_.addState(kStateDetected, [this] { 
+  machine_.addState(kStateDetected, [this] { 
         LOG_INFO("Entering %s", kStateDetected); 
         translation = false;
         rotation = false;
         prev_translation = false;
-        prev_rotation = false;
-    },
-                      [this] {
+        prev_rotation = false; },
+                    [this] {
         if (pixy.ccc.numBlocks) {
             Pose2d move_to = Pose2d::Translation(0,0);
             translation = false;
             rotation = false;
-            Block block = pixy.ccc.blocks[0];
+            Block block = pixy.ccc.blocks[0];            
+            // check first the alignment
             if(std::abs(block.m_x-pixy.frameWidth/2) > get_center_threshold()*pixy.frameWidth){                
-                target_centered = false;
                 if(block.m_x - pixy.frameWidth/2 < 0) {
                     move_to = Pose2d::Rotation(M_PI_4)*Pose2d::Translation(0.2,0);
                 } else {
@@ -123,10 +124,12 @@ void BattleTank::createStateMachine()
                 translation=false;
                 rotation=true;
             } else {
+                // if aligned with the target, check the distance
                 double area_detected = block.m_width * block.m_height;
                 double pixyFrameArea = (pixy.frameWidth * pixy.frameHeight);
                 if (area_detected / pixyFrameArea > get_area_threshold())
                 {
+                    // stop as it's close enough
                     move_to = Pose2d::Translation(0, 0);
                     translation=true;
                     prev_translation=true;
@@ -136,12 +139,14 @@ void BattleTank::createStateMachine()
                 }
                 else
                 {
+                    // move in the direction of the target
                     move_to = Pose2d::Translation(0.5, 0);
                     translation=true;
                     rotation=false;
                 }                
             }
 
+            // do any ajustments only if needed
             if((rotation && !prev_rotation) || (translation && !prev_translation)){
                 prev_rotation = rotation;
                 prev_translation = translation;
@@ -154,6 +159,7 @@ void BattleTank::createStateMachine()
                 tx_goal().publish(); 
             }
         } else {
+            // lost lock, reset state to allow turn to re-aquire the lock
             LOG_ERROR("Lost lock!");
             translation = false;
             rotation = false;
@@ -161,53 +167,60 @@ void BattleTank::createStateMachine()
             prev_rotation = false;
         } }, [] {});
 
-    machine_.addTransition(kStateDetected, kStateShoot,
-                           [this] {
-                               if (shoot_target)
-                               {
-                                   return true;
-                               }
-                               return false;
-                           },
-                           [this] {
-                           });
+  // move kStateShoot if target is aligned and close enough
+  machine_.addTransition(kStateDetected, kStateShoot,
+                         [this] {
+                           if (shoot_target)
+                           {
+                             return true;
+                           }
+                           return false;
+                         },
+                         [this] {
+                         });
 
-    machine_.addState(kStateShoot, [this] {
-        LOG_INFO("Entering %s", kStateShoot);
-        success=true;
-        shoot_target=false;
-        target_centered=false; 
+  machine_.addState(kStateShoot, [this] {
+    LOG_INFO("Entering %s", kStateShoot);
+    success = true;
+    shoot_target = false;
 
-        pixy.m_link.stop();
-        int result;
-        uint8_t *bayerFrame;
-        uint32_t rgbFrame[PIXY2_RAW_FRAME_WIDTH * PIXY2_RAW_FRAME_HEIGHT];
-        // grab raw frame, BGGR Bayer format, 1 byte per pixel
-        pixy.m_link.getRawFrame(&bayerFrame);
-        // convert Bayer frame to RGB frame
-        demosaic(PIXY2_RAW_FRAME_WIDTH, PIXY2_RAW_FRAME_HEIGHT, bayerFrame, rgbFrame);
-        // write frame to PPM file for verification
-        result = writePPM(PIXY2_RAW_FRAME_WIDTH, PIXY2_RAW_FRAME_HEIGHT, rgbFrame, "out", ++index_frame);
-        if(result < 0) {
-        LOG_ERROR("Can't write PPM file");
-        }
-        pixy.m_link.resume();
+    // take a picture with Pixy2
+    pixy.m_link.stop();
+    int result;
+    uint8_t *bayerFrame;
+    uint32_t rgbFrame[PIXY2_RAW_FRAME_WIDTH * PIXY2_RAW_FRAME_HEIGHT];
+    // grab raw frame, BGGR Bayer format, 1 byte per pixel
+    pixy.m_link.getRawFrame(&bayerFrame);
+    // convert Bayer frame to RGB frame
+    demosaic(PIXY2_RAW_FRAME_WIDTH, PIXY2_RAW_FRAME_HEIGHT, bayerFrame, rgbFrame);
+    // write frame to PPM file for verification
+    result = writePPM(PIXY2_RAW_FRAME_WIDTH, PIXY2_RAW_FRAME_HEIGHT, rgbFrame, "out", ++index_frame);
+    if (result < 0)
+    {
+      LOG_ERROR("Can't write PPM file");
+    }
+    pixy.m_link.resume();
+  },
+                    [] {}, [] {});
 
-    }, [] {}, [] {});
+  // move back to kStateNavigation after taking picture
+  machine_.addTransition(kStateShoot, kStateNavigation,
+                         [this] {
+                           if (success)
+                           {
+                             return true;
+                           }
+                           return false;
+                         },
+                         [this] {
+                         });
 
-    machine_.addTransition(kStateShoot, kStateNavigation,
-                           [this] {
-                               if (success)
-                               {
-                                   return true;
-                               }
-                               return false;
-                           },
-                           [this] {
-                           });
-
-    machine_.addState(kStateExit, [this] {}, [] {}, [] {});
+  machine_.addState(kStateExit, [this] {}, [] {}, [] {});
 }
+
+
+// functions from Pixy2 samples to get full raw frames
+// https://github.com/charmedlabs/pixy2/blob/master/src/host/libpixyusb2_examples/get_raw_frame/get_raw_frame.cpp
 int writePPM(uint16_t width, uint16_t height, uint32_t *image, const char *filename, uint32_t index)
 {
   int i, j;

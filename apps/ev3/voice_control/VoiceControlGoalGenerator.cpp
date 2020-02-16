@@ -27,20 +27,16 @@ void VoiceControlGoalGenerator::tick()
   {
     auto proto = rx_detected_command().getProto();
     int id = proto.getCommandId();
-
     switch (id)
     {
     case 1:
       LOG_INFO("Go Left");
       publish_goal(Pose2d::Rotation(M_PI_2));
-      // publish_goal(Pose2d::Translation(1.0,1.0));
       break;
     case 2:
       LOG_INFO("Go Right");
       publish_goal(Pose2d::Rotation(-M_PI_2));
-      // publish_goal(Pose2d::Translation(1.0,-1.0));
       break;
-
     default:
       break;
     }
@@ -49,11 +45,6 @@ void VoiceControlGoalGenerator::tick()
   // Process feedback
   rx_feedback().processLatestNewMessage(
       [this](auto feedback_proto, int64_t pubtime, int64_t acqtime) {
-        // // Check if this feedback is associated with the last goal we transmitted
-        // if (goal_timestamp_ != acqtime)
-        // {
-        //   return;
-        // }
         const bool arrived = feedback_proto.getHasArrived();
         LOG_INFO("Arrived!");
         // Show arrival information on WebSight

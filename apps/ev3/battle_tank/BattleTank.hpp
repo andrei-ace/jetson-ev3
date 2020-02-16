@@ -44,8 +44,13 @@ public:
     ISAAC_PARAM(std::string, navigation_mode,
                 "navigation_mode/isaac.navigation.GroupSelectorBehavior");
 
+    // Parameter to align the tank with the target
+    // If the distance between the frame's center and target's center is smaller than center_threshold * pixy.frameWidth it is considered aligned 
     ISAAC_PARAM(double, center_threshold, 0.1);
-    ISAAC_PARAM(double, area_threshold, 0.055);
+
+    // Parameter to control the distance between tank and target
+    // If the target's detected area is bigger than area_threshold * total area then the target is considered close enough
+    ISAAC_PARAM(double, area_threshold, 0.1);
 
     ISAAC_POSE2(world,robot);
 
@@ -55,9 +60,14 @@ private:
     uint32_t index_frame = 0;    
 
     navigation::GroupSelectorBehavior* navigation_mode_;
-    bool target_centered = false;
+
+    // True if we are aligned with the target and close enough
     bool shoot_target = false;
+
+    // flag for mission's success. If it's true then we took the picture
     bool success = false;
+
+    // flags used for getting closer to the target. Don't generate aditional goals if we already doing the desired movement.
     bool translation = false;
     bool rotation = false;
     bool prev_translation = false;
