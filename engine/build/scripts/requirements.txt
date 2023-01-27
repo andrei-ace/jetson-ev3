@@ -7,7 +7,7 @@ scipy
 gym==0.10.5
 graphviz
 nltk
-onnx==1.4.1
+onnx==1.13.0
 onnxmltools
 tf2onnx
 
